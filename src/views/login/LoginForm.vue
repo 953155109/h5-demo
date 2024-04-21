@@ -4,14 +4,14 @@
       v-model="formData.username"
       class="enter-y mb-4 items-center !rounded-md"
       name="username"
-      placeholder="用户名"
+      placeholder="验证码"
       :rules="getFormRules.username"
     >
       <template #left-icon>
         <i class="i-ph:user-bold mr-2 text-lg" />
       </template>
     </van-field>
-    <van-field
+    <!-- <van-field
       v-model="formData.password"
       class="enter-y mb-4 items-center !rounded-md"
       :type="switchPassType ? 'password' : 'text'"
@@ -27,15 +27,15 @@
         <i v-if="switchPassType" class="i-mdi:eye-outline mr-2 text-lg" />
         <i v-else class="i-mdi:eye-off mr-2 text-lg" />
       </template>
-    </van-field>
+    </van-field> -->
 
-    <div class="enter-y mb-10 w-full flex justify-between px-5px">
+    <!-- <div class="enter-y mb-10 w-full flex justify-between px-5px">
       <div class="flex items-center">
         <van-switch v-model="rememberMe" size="18px" class="mr-8px" />
         <span>记住我</span>
       </div>
       <a @click="setLoginState(LoginStateEnum.RESET_PASSWORD)">忘记密码?</a>
-    </div>
+    </div> -->
 
     <van-button
       class="enter-y !mb-4 !rounded-md"
@@ -46,7 +46,7 @@
     >
       登 录
     </van-button>
-    <van-button
+    <!-- <van-button
       class="enter-y !rounded-md"
       plain
       type="primary"
@@ -54,7 +54,7 @@
       @click="setLoginState(LoginStateEnum.REGISTER)"
     >
       注 册
-    </van-button>
+    </van-button> -->
   </van-form>
 </template>
 

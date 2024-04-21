@@ -106,6 +106,24 @@ const routeModuleList: Array<RouteRecordRaw> = [
     component: () => import('@/views/my/EditNickname.vue'),
   },
   {
+    path: '/pay',
+    name: 'pay',
+    meta: {
+      title: '支付',
+      innerPage: true,
+    },
+    component: () => import('@/views/demo/pay.vue'),
+  },
+  {
+    path: '/step',
+    name: 'step',
+    meta: {
+      title: '流程',
+      innerPage: true,
+    },
+    component: () => import('@/views/demo/step.vue'),
+  },
+  {
     path: '/editSign',
     name: 'EditSign',
     meta: {

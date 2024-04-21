@@ -39,6 +39,8 @@ function toggle() {
 const menuItems = [
   { title: '🐗 keep-alive', route: '/editNickname' },
   { title: '🦘 404 页演示', route: '/404' },
+  { title: '流程页演示', route: '/step' },
+  { title: '支付页页演示', route: '/pay' },
 ]
 </script>
 

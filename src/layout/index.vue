@@ -1,3 +1,11 @@
+<!--
+ * @Descripttion: 
+ * @version: 
+ * @Author: EVE
+ * @Date: 2024-04-20 20:40:02
+ * @LastEditors: EVE
+ * @LastEditTime: 2024-04-21 10:22:06
+-->
 <!-- eslint-disable prettier/prettier -->
 <template>
   <div class="h-screen flex flex-col">
@@ -17,7 +25,7 @@
         <component :is="Component" v-else :key="route.fullPath" />
       </template>
     </routerView>
-    <van-tabbar route class="tabbar">
+    <!-- <van-tabbar route class="tabbar">
       <van-tabbar-item
         v-for="menu in getMenus"
         :key="menu.name"
@@ -29,7 +37,7 @@
         </template>
         {{ menu.meta?.title }}
       </van-tabbar-item>
-    </van-tabbar>
+    </van-tabbar> -->
   </div>
 </template>
 
