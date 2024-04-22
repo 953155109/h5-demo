@@ -1,5 +1,5 @@
 <template>
-  <vanConfigProvider :theme="getDarkMode" :theme-vars="getThemeVars()">
+  <vanConfigProvider :theme-vars="getThemeVars()">
     <routerView v-slot="{ Component }">
       <div class="absolute bottom-0 top-0 w-full overflow-hidden">
         <transition :name="getTransitionName" mode="out-in" appear>
@@ -13,20 +13,20 @@
 </template>
 
 <script setup lang="ts">
-import { darken, lighten } from '@/utils'
-import { useRouteStore } from '@/store/modules/route'
-import { useDesignSetting } from '@/hooks/setting/useDesignSetting'
+import { darken, lighten } from "@/utils";
+import { useRouteStore } from "@/store/modules/route";
+import { useDesignSetting } from "@/hooks/setting/useDesignSetting";
 
-const routeStore = useRouteStore()
-const { getDarkMode, getAppTheme, getIsPageAnimate, getPageAnimateType } = useDesignSetting()
+const routeStore = useRouteStore();
+const { getDarkMode, getAppTheme, getIsPageAnimate, getPageAnimateType } = useDesignSetting();
 
 // 需要缓存的路由组件
-const keepAliveComponents = computed(() => routeStore.keepAliveComponents)
+const keepAliveComponents = computed(() => routeStore.keepAliveComponents);
 
 function getThemeVars() {
-  const appTheme = unref(getAppTheme)
-  const darkenStr = darken(appTheme, 25)
-  const lightenStr = lighten(appTheme, 10)
+  const appTheme = unref(getAppTheme);
+  const darkenStr = darken(appTheme, 25);
+  const lightenStr = lighten(appTheme, 10);
 
   return {
     actionSheetCancelTextColor: appTheme,
@@ -64,14 +64,14 @@ function getThemeVars() {
     tabsBottomBarColor: appTheme,
     tabbarItemActiveColor: appTheme,
     treeSelectItemActiveColor: appTheme,
-  }
+  };
 }
 
 const getTransitionName = computed(() => {
-  return unref(getIsPageAnimate) ? unref(getPageAnimateType) : undefined
-})
+  return unref(getIsPageAnimate) ? unref(getPageAnimateType) : undefined;
+});
 </script>
 
 <style lang="less">
-  @import './styles/index.less';
+@import "./styles/index.less";
 </style>
