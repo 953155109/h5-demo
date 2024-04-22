@@ -9,7 +9,7 @@
 <template>
   <div>
     <NavBar>
-      <template #right> </template>
+      <template #right></template>
     </NavBar>
     <!-- 输入订单号 -->
     <van-field
@@ -21,13 +21,15 @@
       </template>
     </van-field>
     <!-- 查询按钮 -->
-<!--    <van-button type="primary" @click="fetchSteps">查询</van-button>-->
+    <!--    <van-button type="primary" @click="fetchSteps">查询</van-button>-->
 
     <!-- 根据查询结果显示进度条 -->
     <van-steps v-if="stepsFetched" direction="vertical" :active="activeStep">
       <van-step v-for="(item, index) in stepList" :key="index">{{ item.title }}
         <template v-if="item.title === '待结算' && index === activeStep">
-          <van-button class="settlement-button" type="default" size="mini" @click="goToSettlement">去结算</van-button>
+          <van-button class="settlement-button" type="default" size="mini" @click="goToSettlement">
+            去结算
+          </van-button>
         </template>
       </van-step>
     </van-steps>
@@ -35,14 +37,14 @@
 </template>
 
 <script setup lang="ts">
-import type { FormInstance } from "vant";
-import { showToast } from "vant";
+import type {FormInstance} from "vant";
+import {showToast} from "vant";
 import NavBar from "../demo/components/NavBar.vue";
-import { useUserStore } from "@/store/modules/user";
+import {useUserStore} from "@/store/modules/user";
 
 const userStore = useUserStore();
 
-const { nickname } = userStore.getUserInfo;
+const {nickname} = userStore.getUserInfo;
 const formRef = ref<FormInstance>();
 
 const orderNumber = ref('');
@@ -94,19 +96,20 @@ const goToSettlement = () => {
 const next = () => {
   active.value++;
 };
-onMounted(() => {});
+onMounted(() => {
+});
 
 const fetchSteps = () => {
   // 模拟数据示例
   stepList.value = [
-    { title: "提交订单", content: "时间详情" },
-    { title: "订单审核中", content: "时间详情" },
-    { title: "待接单", content: "时间详情" },
-    { title: "待上门", content: "时间详情" },
-    { title: "处理中", content: "时间详情" },
-    { title: "处理完成", content: "时间详情" },
-    { title: "待结算", content: "时间详情" },
-    { title: "质量回访", content: "时间详情" }
+    {title: "提交订单", content: "时间详情"},
+    {title: "订单审核中", content: "时间详情"},
+    {title: "待接单", content: "时间详情"},
+    {title: "待上门", content: "时间详情"},
+    {title: "处理中", content: "时间详情"},
+    {title: "处理完成", content: "时间详情"},
+    {title: "待结算", content: "时间详情"},
+    {title: "质量回访", content: "时间详情"}
   ];
   // 假设当前活跃步骤是 "处理中"
   activeStep.value = 6;
@@ -119,6 +122,7 @@ const fetchSteps = () => {
 .note {
   color: var(--van-text-color-2);
 }
+
 .settlement-button {
   min-height: 22px; /* 调整按钮的最小高度，视需求而定 */
   padding: 0 10px; /* 调整按钮的内边距，使其看起来更紧凑 */

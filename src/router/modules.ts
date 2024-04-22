@@ -121,7 +121,7 @@ const routeModuleList: Array<RouteRecordRaw> = [
       title: '流程',
       innerPage: true,
     },
-    component: () => import('@/views/demo/step.vue'),
+    component: () => import('@/views/workflow/Step.vue'),
   },
   {
     path: '/editSign',
