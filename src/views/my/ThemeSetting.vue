@@ -25,10 +25,7 @@
           :style="{ 'background-color': item }"
           @click="togTheme(item)"
         >
-          <i
-            v-show="item === designStore.appTheme"
-            class="i-ic:sharp-check" text-2xl text-white
-          />
+          <i v-show="item === designStore.appTheme" class="i-ic:sharp-check" text-2xl text-white />
         </span>
       </div>
     </div>
@@ -43,10 +40,10 @@
       <van-cell center title="动画类型">
         <van-field
           v-model="animateState.text"
-          readonly
+
           class="!p-0"
           :disabled="!designStore.isPageAnimate"
-          is-link
+          is-link readonly
           label-class="font-bold"
           input-align="right"
           :center="true"
@@ -76,8 +73,8 @@ import { animates as animateOptions } from '@/settings/animateSetting'
 const designStore = useDesignSettingStore()
 
 const isDark = useDark({
-  valueDark: 'dark',
   valueLight: 'light',
+  valueDark: 'dark',
 })
 
 const toggleDark = useToggle(isDark)

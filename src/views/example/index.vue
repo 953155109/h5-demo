@@ -4,7 +4,7 @@
       <van-cell center title="🌓 暗黑模式">
         <template #right-icon>
           <i inline-block align-middle i="dark:carbon-moon carbon-sun" />
-          <span class="ml-2">{{ isDark ? 'Dark' : 'Light' }}</span>
+          <span class="ml-2">{{ isDark ? "Dark" : "Light" }}</span>
           <span class="mx-2">{{ isDark }}</span>
           <van-switch v-model="checked" size="22" @click="toggle()" />
         </template>
@@ -23,8 +23,8 @@ import { useDesignSettingStore } from '@/store/modules/designSetting'
 const designStore = useDesignSettingStore()
 
 const isDark = useDark({
-  valueDark: 'dark',
   valueLight: 'light',
+  valueDark: 'dark',
 })
 
 const checked = ref(isDark.value)
@@ -44,6 +44,4 @@ const menuItems = [
 ]
 </script>
 
-<style scoped lang="less">
-
-</style>
+<style scoped lang="less"></style>
