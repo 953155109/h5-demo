@@ -22,8 +22,8 @@
 
     <!-- 根据查询结果显示进度条 -->
     <van-steps v-if="stepsFetched" direction="vertical" :active="activeStep">
-      <van-step v-for="(item, index) in stepList" :key="index"
-        >{{ item.title }}
+      <van-step v-for="(item, index) in stepList" :key="index">
+        {{ item.title }}
         <template v-if="item.title === '待结算' && index === activeStep">
           <van-button class="settlement-button" type="default" size="mini" @click="goToSettlement">
             去结算
@@ -37,7 +37,7 @@
 <script setup lang="ts">
 import type { FormInstance } from "vant";
 import { showToast } from "vant";
-import NavBar from "../demo/components/NavBar.vue";
+import NavBar from "../pay/NavBar.vue";
 import { useUserStore } from "@/store/modules/user";
 
 const userStore = useUserStore();
@@ -49,7 +49,7 @@ const orderNumber = ref("");
 const activeStep = ref(0);
 const stepsFetched = ref(false);
 // const stepList = ref([]);
-
+const router = useRouter()
 const active = ref(1);
 const stepList = ref([
   {
@@ -89,6 +89,7 @@ const stepList = ref([
 const goToSettlement = () => {
   // 处理去结算的逻辑，例如跳转到结算页面或调用支付接口
   showToast("跳转到结算页面...");
+  router.replace('/pay');
 };
 
 const next = () => {

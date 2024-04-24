@@ -87,6 +87,8 @@ import {useUserStore} from '@/store/modules/user'
 import {ResultEnum} from '@/enums/httpEnum'
 import {PageEnum} from '@/enums/pageEnum'
 
+import {encryptData,decryptData} from '@/utils/crypto'
+
 const {getLoginState} = useLoginState()
 const {getFormRules} = useFormRules()
 const userStore = useUserStore()
@@ -127,7 +129,7 @@ function handleSubmit() {
     .then(async () => {
       try {
         loading.value = true
-        showLoadingToast('登录中...')
+        // showLoadingToast('登录中...')
         const {code, message: msg} = await userStore.Login({
           username: formData.username,
           password: formData.password,

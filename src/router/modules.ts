@@ -109,10 +109,10 @@ const routeModuleList: Array<RouteRecordRaw> = [
     path: '/pay',
     name: 'pay',
     meta: {
-      title: '支付',
+      title: '订单支付',
       innerPage: true,
     },
-    component: () => import('@/views/demo/pay.vue'),
+    component: () => import('@/views/pay/Pay.vue'),
   },
   {
     path: '/step',

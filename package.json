@@ -33,16 +33,14 @@
     "type:check": "vue-tsc --noEmit --skipLibCheck",
     "preview": "vite preview",
     "clean:cache": "rimraf node_modules/.cache/ && rimraf node_modules/.vite",
-    "clean:lib": "rimraf node_modules",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
-    "lint:lint-staged": "lint-staged"
+    "clean:lib": "rimraf node_modules"
   },
   "dependencies": {
     "@types/lodash-es": "^4.17.12",
     "@unocss/reset": "^0.58.5",
     "@vueuse/core": "^10.7.0",
     "axios": "^1.4.0",
+    "crypto-js": "^4.2.0",
     "date-fns": "^3.0.6",
     "echarts": "^5.4.3",
     "lodash-es": "^4.17.21",
@@ -53,19 +51,19 @@
     "qs": "^6.11.2",
     "vant": "^4.8.1",
     "vue": "^3.3.13",
-    "vue-router": "4.2.5"
+    "vue-router": "4.2.5",
+    "weixin-js-sdk": "^1.6.5"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^2.6.3",
     "@commitlint/cli": "^18.4.3",
     "@commitlint/config-conventional": "^18.4.3",
     "@iconify/json": "^2.2.188",
+    "@types/crypto-js": "^4.2.2",
     "@types/fs-extra": "^11.0.4",
     "@types/mockjs": "^1.0.10",
     "@types/node": "^20.10.5",
     "@types/nprogress": "^0.2.3",
     "@types/qs": "^6.9.11",
-    "@unocss/eslint-plugin": "^0.58.4",
     "@unocss/preset-icons": "^0.58.5",
     "@unocss/preset-rem-to-px": "^0.58.5",
     "@unocss/transformer-directives": "^0.58.4",
@@ -75,8 +73,6 @@
     "cross-env": "^7.0.3",
     "cz-git": "^1.8.0",
     "dotenv": "^16.3.1",
-    "eslint": "^8.56.0",
-    "eslint-plugin-format": "^0.1.0",
     "esno": "^0.16.3",
     "fs-extra": "^11.2.0",
     "less": "^4.2.0",
@@ -103,9 +99,6 @@
   "simple-git-hooks": {
     "pre-commit": "pnpm lint-staged",
     "commit-msg": "npx --no-install commitlint --edit $1"
-  },
-  "lint-staged": {
-    "*": "eslint --fix"
   },
   "config": {
     "commitizen": {
