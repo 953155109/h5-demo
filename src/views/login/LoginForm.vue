@@ -87,7 +87,8 @@ import {useUserStore} from '@/store/modules/user'
 import {ResultEnum} from '@/enums/httpEnum'
 import {PageEnum} from '@/enums/pageEnum'
 
-import {encryptData,decryptData} from '@/utils/crypto'
+import {encryptData, decryptData} from '@/utils/crypto'
+import {getSmsCode} from "@/api/sms/sms";
 
 const {getLoginState} = useLoginState()
 const {getFormRules} = useFormRules()
@@ -120,6 +121,11 @@ function startCountdown() {
 function handleSendSMS() {
   // 在这里添加发送验证码的逻辑
   // 发送验证码成功后，启动倒计时
+  const customerPhone = formData.username;
+  const ecPhone = encryptData({customerPhone});
+  getSmsCode({
+    'customerPhone': ecPhone
+  });
   startCountdown()
 }
 
@@ -136,7 +142,7 @@ function handleSubmit() {
         })
         if (code === ResultEnum.SUCCESS) {
           const toPath = decodeURIComponent((route.query?.redirect || '/') as string)
-         // showSuccessToast('登录成功，即将进入系统')
+          // showSuccessToast('登录成功，即将进入系统')
           if (route.name === PageEnum.BASE_LOGIN_NAME) {
             await router.replace('/');
           } else {
