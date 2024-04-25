@@ -114,10 +114,10 @@ onMounted(() => {});
 .note {
   color: var(--van-text-color-2);
 }
-//.wechat-pay /deep/ .van-button {
-//  background-color: #1aad19; /* 微信绿色 */
-//  color: white;
-//}
+.wechat-pay /deep/ .van-button {
+  background: #1aad19; /* 微信绿色 */
+  color: white;
+}
 .logo-container {
   text-align: center; /* Logo 居中显示 */
   margin: auto; /* 自动边距以确保居中 */
