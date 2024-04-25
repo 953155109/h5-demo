@@ -69,11 +69,11 @@ const local = encodeURIComponent("https://5d51-2409-8a44-8676-8a70-3daa-5e30-e28
 function onBridgeReady() {
   WeixinJSBridge.invoke('getBrandWCPayRequest', {
       "appId": "wx668a7d9188ea21c5",     //公众号ID，由商户传入
-      "timeStamp": "1713874186",     //时间戳，自1970年以来的秒数
-      "nonceStr": "DC1zzQt40HevK0pbalfzM0gceIxJPmLD",      //随机串
-      "package": "prepay_id=wx23200947337258e9845642b7d1071e0001",
+      "timeStamp": "1714054192",     //时间戳，自1970年以来的秒数
+      "nonceStr": "y4XaqOIYe70ua5XUeynep4UuKp4cFYUS",      //随机串
+      "package": "prepay_id=wx252209516282578801e1c5c98e65240000",
       "signType": "RSA",     //微信签名方式：
-      "paySign": "MZNJJKqYmDEoxzDoyZFjpIQAFSKbsOKqmih/aOzHlFVL1dohgwNr7mLZpqDm1NRjO7TpcrmgdAjHLky8OZkDklCKeiSIviUQehU8cYTWlnTY2J3X6WpqMPBOl9Ra5aTEyDV2QjmGf7LvGrVPoJKGdLCkiRXE30VP2kbLYxIJ5ATt/xk2z5k4HvYM22MbwtQRCKgBsDCFJyMGFhNPsFCV1f/lPzmTlJMKn9B0NE3YQHsOfbI6SdVX1ArBTR+sDB7QkyxQrbt/mJTz6IwFmkMkqIJvIfcLtUIFrpnlH3Lm7/sCG3cMUg8jxkXMLztgHU6tFlK4FFOgHlnPV0dcv3pBnA==" //微信签名
+      "paySign": "XFWmrPKFVkT2PHTPTX5Ae1c0ksi8Pzf4mbyPZFJwO+756dTNRLGbf4qLU4U9eTNoLGZ04E9yADS472jJdE4ohk93EsWIgMRXm5xW58AA8FTpkYW5H6Y+hmxxHVKpISnWy2PYgf45XSuNTkT/BXwfnPtfyZK4yz/cx+BzmB+wwVstCewPD7yvpz+XUd/w3dulF/vlDNecdGhW60K3e3YrOwW0yCKoRzuRbJOoghT3rH5iM7yU1CgckviZ47oE/dF3pokxylLLpQmhPM30ZEfQ3V/X/F6ZUgNpHExMrlJtcLCa7RxKaqMJUsVEnb8U3pqFflrnJRRYSF/HOXG+8u/l7w==" //微信签名
     },
     function(res) {
       if (res.err_msg == "get_brand_wcpay_request:ok") {
