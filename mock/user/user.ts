@@ -37,7 +37,7 @@ const fakeUserList = [
 
 export default [
   {
-    url: '/api/login',
+    url: '/api/swy-sidecar/auth/getQueryToken',
     timeout: 1000,
     method: 'post',
     response: ({ body }) => {

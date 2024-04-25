@@ -1,16 +1,22 @@
+<!--
+ * @Descripttion: 
+ * @version: 
+ * @Author: EVE
+ * @Date: 2024-04-24 23:45:51
+ * @LastEditors: EVE
+ * @LastEditTime: 2024-04-25 23:04:15
+-->
 <template>
   <van-form v-if="getShow" ref="formRef" class="flex flex-col items-center" @submit="handleSubmit">
-
-
     <van-field
-      v-model="formData.username"
+      v-model="formData.userPhone"
       class="enter-y mb-4 items-center !rounded-md"
-      name="username"
-      placeholder="用户名"
-      :rules="getFormRules.username"
+      name="userPhone"
+      placeholder="输入手机号"
+      :rules="getFormRules.userPhone"
     >
       <template #left-icon>
-        <i class="i-ph:user-bold mr-2 text-lg"/>
+        <i class="i-ph:user-bold mr-2 text-lg" />
       </template>
     </van-field>
 
@@ -23,11 +29,11 @@
       :rules="getFormRules.sms"
     >
       <template #left-icon>
-        <i class="i-material-symbols:edit-square-outline-rounded mr-2 text-lg"/>
+        <i class="i-material-symbols:edit-square-outline-rounded mr-2 text-lg" />
       </template>
       <template #button>
         <van-button @click="handleSendSMS" :disabled="countdown > 0">
-          {{ countdown > 0 ? `${countdown} 秒后重发` : '发送验证码' }}
+          {{ countdown > 0 ? `${countdown} 秒后重发` : "发送验证码" }}
         </van-button>
       </template>
     </van-field>
@@ -80,88 +86,88 @@
 </template>
 
 <script setup lang="ts">
-import {showFailToast, showLoadingToast, showSuccessToast} from 'vant'
-import type {FormInstance} from 'vant'
-import {LoginStateEnum, useFormRules, useLoginState} from './useLogin'
-import {useUserStore} from '@/store/modules/user'
-import {ResultEnum} from '@/enums/httpEnum'
-import {PageEnum} from '@/enums/pageEnum'
+import { showFailToast, showLoadingToast, showSuccessToast } from "vant";
+import type { FormInstance } from "vant";
+import { LoginStateEnum, useFormRules, useLoginState } from "./useLogin";
+import { useUserStore } from "@/store/modules/user";
+import { ResultEnum } from "@/enums/httpEnum";
+import { PageEnum } from "@/enums/pageEnum";
 
-import {encryptData, decryptData} from '@/utils/crypto'
-import {getSmsCode} from "@/api/sms/sms";
+import { encryptData, decryptData } from "@/utils/crypto";
+import { getSmsCode } from "@/api/sms/sms";
 
-const {getLoginState} = useLoginState()
-const {getFormRules} = useFormRules()
-const userStore = useUserStore()
-const router = useRouter()
-const route = useRoute()
+const { getLoginState } = useLoginState();
+const { getFormRules } = useFormRules();
+const userStore = useUserStore();
+const router = useRouter();
+const route = useRoute();
 
-const formRef = ref<FormInstance>()
-const loading = ref(false)
+const formRef = ref<FormInstance>();
+const loading = ref(false);
 const formData = reactive({
-  username: 'admin',
-  password: '123456',
-  sms: '',
-})
+  userPhone: "11133322111",
+  password: "123456",
+  sms: "",
+});
 
-const getShow = computed(() => unref(getLoginState) === LoginStateEnum.LOGIN)
-let countdown = ref(0) // 倒计时时间，单位秒
+const getShow = computed(() => unref(getLoginState) === LoginStateEnum.LOGIN);
+let countdown = ref(0); // 倒计时时间，单位秒
 
 function startCountdown() {
-  countdown.value = 60 // 重置倒计时时间
+  countdown.value = 60; // 重置倒计时时间
   const timer = setInterval(() => {
     if (countdown.value > 0) {
-      countdown.value--
+      countdown.value--;
     } else {
-      clearInterval(timer) // 倒计时结束，清除计时器
+      clearInterval(timer); // 倒计时结束，清除计时器
     }
-  }, 1000) // 每秒执行一次
+  }, 1000); // 每秒执行一次
 }
 
-function handleSendSMS() {
+const handleSendSMS = async () => {
   // 在这里添加发送验证码的逻辑
   // 发送验证码成功后，启动倒计时
-  const customerPhone = formData.username;
-  const ecPhone = encryptData({customerPhone});
-  getSmsCode({
-    'customerPhone': ecPhone
+  const customerPhone = formData.userPhone;
+  const ecPhone = encryptData({ customerPhone });
+  const resp = await getSmsCode({
+    customerPhone: ecPhone,
   });
-  startCountdown()
-}
+  console.log(resp, `resp`);
+  startCountdown();
+};
 
 function handleSubmit() {
   formRef.value
     ?.validate()
     .then(async () => {
       try {
-        loading.value = true
+        loading.value = true;
         // showLoadingToast('登录中...')
-        const {code, message: msg} = await userStore.Login({
-          username: formData.username,
-          password: formData.password,
-        })
+        const { code, message: msg } = await userStore.Login({
+          customerPhone: formData.userPhone,
+          code: formData.sms,
+        });
         if (code === ResultEnum.SUCCESS) {
-          const toPath = decodeURIComponent((route.query?.redirect || '/') as string)
+          const toPath = decodeURIComponent((route.query?.redirect || "/") as string);
           // showSuccessToast('登录成功，即将进入系统')
           if (route.name === PageEnum.BASE_LOGIN_NAME) {
-            await router.replace('/');
+            await router.replace("/");
           } else {
             await router.replace(toPath);
           }
         } else {
-          showFailToast(msg || '登录失败')
+          showFailToast(msg || "登录失败");
         }
       } finally {
-        loading.value = false
+        loading.value = false;
       }
     })
     .catch(() => {
-      console.error('验证失败')
-    })
+      console.error("验证失败");
+    });
 }
 
-onMounted(() => {
-})
+onMounted(() => {});
 </script>
 
 <style scoped lang="less"></style>
