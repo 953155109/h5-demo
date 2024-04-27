@@ -12,7 +12,7 @@ export interface BasicResponseModel<T = any> {
 export function login(params: any) {
   return http.request<BasicResponseModel>(
     {
-      url: '/swy-sidecar/auth/getQueryToken',
+      url: '/auth/getQueryToken',
       // url: '/login',
       method: 'POST',
       params,

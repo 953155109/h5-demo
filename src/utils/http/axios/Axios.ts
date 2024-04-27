@@ -46,6 +46,7 @@ export class VAxios {
     if (!this.axiosInstance) {
       return
     }
+    headers['ngrok-skip-browser-warning'] = 'true';
     Object.assign(this.axiosInstance.defaults.headers, headers)
   }
 
