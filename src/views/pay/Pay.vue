@@ -45,6 +45,7 @@ import type { FormInstance } from 'vant';
 import { showToast } from 'vant';
 import NavBar from "./NavBar.vue";
 import { useUserStore } from "@/store/modules/user";
+import wx from "weixin-js-sdk";
 
 const userStore = useUserStore();
 
@@ -66,18 +67,18 @@ const ua = navigator.userAgent.toLowerCase();
 const isWeiXin = ua.indexOf('micromessenger') != -1;
 const local = encodeURIComponent("https://5d51-2409-8a44-8676-8a70-3daa-5e30-e287-4f1b.ngrok-free.app/#/pay");
 
-function onBridgeReady() {
+function onBridgeReady(wxPayReq) {
   WeixinJSBridge.invoke('getBrandWCPayRequest', {
-      "appId": "wx668a7d9188ea21c5",     //公众号ID，由商户传入
-      "timeStamp": "1714054192",     //时间戳，自1970年以来的秒数
-      "nonceStr": "y4XaqOIYe70ua5XUeynep4UuKp4cFYUS",      //随机串
-      "package": "prepay_id=wx252209516282578801e1c5c98e65240000",
-      "signType": "RSA",     //微信签名方式：
-      "paySign": "XFWmrPKFVkT2PHTPTX5Ae1c0ksi8Pzf4mbyPZFJwO+756dTNRLGbf4qLU4U9eTNoLGZ04E9yADS472jJdE4ohk93EsWIgMRXm5xW58AA8FTpkYW5H6Y+hmxxHVKpISnWy2PYgf45XSuNTkT/BXwfnPtfyZK4yz/cx+BzmB+wwVstCewPD7yvpz+XUd/w3dulF/vlDNecdGhW60K3e3YrOwW0yCKoRzuRbJOoghT3rH5iM7yU1CgckviZ47oE/dF3pokxylLLpQmhPM30ZEfQ3V/X/F6ZUgNpHExMrlJtcLCa7RxKaqMJUsVEnb8U3pqFflrnJRRYSF/HOXG+8u/l7w==" //微信签名
+      "appId": wxPayReq.appId,     //公众号ID，由商户传入
+      "timeStamp": wxPayReq.timeStamp,     //时间戳，自1970年以来的秒数
+      "nonceStr": wxPayReq.nonceStr,      //随机串
+      "package": wxPayReq.packageVal,
+      "signType": wxPayReq.signType,     //微信签名方式：
+      "paySign": wxPayReq.paySign//微信签名
     },
     function(res) {
       if (res.err_msg == "get_brand_wcpay_request:ok") {
-        // 使用以上方式判断前端返回,微信团队郑重提示：
+        console.log("支付成功");
         //res.err_msg将在用户支付成功后返回ok，但并不保证它绝对可靠。
       }
     });
