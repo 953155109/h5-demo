@@ -104,6 +104,3 @@ export function getWxpay(params: any) {
     },
   )
 }
-
-
-/wxPay/prepay
