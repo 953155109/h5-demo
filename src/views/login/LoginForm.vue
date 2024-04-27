@@ -4,7 +4,7 @@
  * @Author: EVE
  * @Date: 2024-04-24 23:45:51
  * @LastEditors: EVE
- * @LastEditTime: 2024-04-27 16:03:54
+ * @LastEditTime: 2024-04-27 18:50:57
 -->
 <template>
   <van-form v-if="getShow" ref="formRef" class="flex flex-col items-center" @submit="handleSubmit">
@@ -109,6 +109,8 @@ const formData = reactive({
   password: "123456",
   sms: "",
 });
+import { createStorage } from "@/utils/Storage";
+const Storage = createStorage({ storage: localStorage });
 
 const getShow = computed(() => unref(getLoginState) === LoginStateEnum.LOGIN);
 let countdown = ref(0); // 倒计时时间，单位秒
@@ -151,11 +153,10 @@ function handleSubmit() {
           customerPhone: encryptData(formData.userPhone),
           code: encryptData(formData.sms),
         });
-        console.log(code, msg, `code, msg`,ResultEnum,ResultEnum.SUCCESS);
+        Storage.get("phone", formData.userPhone);
         if (code == ResultEnum.SUCCESS) {
-          console.log(`进入`)
           const toPath = decodeURIComponent((route.query?.redirect || "/") as string);
-          console.log(toPath, `toPath`,route.name);
+          console.log(toPath, `toPath`, route.name);
           // showSuccessToast('登录成功，即将进入系统')
           if (route.name === PageEnum.BASE_LOGIN_NAME) {
             await router.replace("/");
@@ -170,7 +171,7 @@ function handleSubmit() {
       }
     })
     .catch((err) => {
-      console.error("验证失败",err);
+      console.error("验证失败", err);
     });
 }
 

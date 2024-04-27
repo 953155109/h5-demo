@@ -41,8 +41,8 @@ export const useUserStore = defineStore({
     lastUpdateTime: 0,
   }),
   getters: {
-    getUserInfo(): UserInfo {
-      return this.userInfo || Storage.get(CURRENT_USER, '') || {}
+    getUserInfo() {
+      return {}
     },
     getToken(): string {
       return this.token || Storage.get(ACCESS_TOKEN, '')
@@ -65,11 +65,10 @@ export const useUserStore = defineStore({
     async Login(params: LoginParams) {
       try {
         const response = await login(params)
-        console.log(response,2312321)
         const { data, code } = response
         if (code === ResultEnum.SUCCESS) {
           // save token
-          this.setToken(data.token)
+          this.setToken(data)
         }
         return Promise.resolve(response)
       }
@@ -79,16 +78,16 @@ export const useUserStore = defineStore({
     },
 
     async GetUserInfo() {
-      return new Promise((resolve, reject) => {
-        getUserInfo()
-          .then((res) => {
-            this.setUserInfo(res)
-            resolve(res)
-          })
-          .catch((error) => {
-            reject(error)
-          })
-      })
+      // return new Promise((resolve, reject) => {
+      //   getUserInfo()
+      //     .then((res) => {
+      //       this.setUserInfo(res)
+      //       resolve(res)
+      //     })
+      //     .catch((error) => {
+      //       reject(error)
+      //     })
+      // })
     },
 
     async Logout() {

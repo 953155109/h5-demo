@@ -3,8 +3,8 @@
  * @version:
  * @Author: EVE
  * @Date: 2024-04-20 20:40:02
- * @LastEditors: Please set LastEditors
- * @LastEditTime: 2024-04-22 12:25:24
+ * @LastEditors: EVE
+ * @LastEditTime: 2024-04-27 18:52:09
 -->
 <template>
   <div class="step-box">
@@ -14,7 +14,7 @@
     <!-- 输入订单号 -->
     <van-field v-model="orderNumber" placeholder="请输入订单号" button-slot>
       <template #button>
-        <van-button type="primary" @click="fetchSteps">查询</van-button>
+        <van-button type="primary" @click="fetchSteps" :loading="fetching">查询</van-button>
       </template>
     </van-field>
     <!-- 查询按钮 -->
@@ -36,10 +36,12 @@
 
 <script setup lang="ts">
 import type { FormInstance } from "vant";
-import { showToast } from "vant";
+import { showToast, showFailToast } from "vant";
 import NavBar from "../pay/NavBar.vue";
 import { useUserStore } from "@/store/modules/user";
-
+import { getflowStatus } from "@/api/sms/sms";
+import { createStorage } from "@/utils/Storage";
+const Storage = createStorage({ storage: localStorage });
 const userStore = useUserStore();
 
 const { nickname } = userStore.getUserInfo;
@@ -48,48 +50,57 @@ const formRef = ref<FormInstance>();
 const orderNumber = ref("");
 const activeStep = ref(0);
 const stepsFetched = ref(false);
-// const stepList = ref([]);
-const router = useRouter()
+const fetching = ref(false);
+
+const router = useRouter();
 const active = ref(1);
 const stepList = ref([
   {
-    title: "提交订单",
-    content: "2016-07-12 19:30",
+    title: "待工程师接单",
+    value: "approved",
+    index: 0,
   },
   {
-    title: "订单审核中",
-    content: "2016-07-12 19:35",
+    title: "待上门处理",
+    value: "acceptOrder",
+    index: 1,
   },
   {
-    title: "待接单",
-    content: "2016-07-12 20:05",
+    title: "工单处理中",
+    value: "startService",
+    index: 2,
   },
   {
-    title: "待上门",
-    content: "2016-07-12 20:05",
-  },
-  {
-    title: "处理中",
-    content: "2016-07-12 19:30",
-  },
-  {
-    title: "处理完成",
-    content: "2016-07-12 19:35",
+    title: "工单处理完成",
+    value: "serviceEnd",
+    index: 3,
   },
   {
     title: "待结算",
-    content: "2016-07-12 20:05",
+    value: "settlement",
+    index: 4,
   },
   {
     title: "质量回访",
-    content: "2016-07-12 20:05",
+    value: "review",
+    index: 5,
+  },
+  {
+    title: "已结束",
+    value: "end",
+    index: 6,
+  },
+  {
+    title: "工单取消",
+    value: "cancel",
+    index: 7,
   },
 ]);
 
 const goToSettlement = () => {
   // 处理去结算的逻辑，例如跳转到结算页面或调用支付接口
   showToast("跳转到结算页面...");
-  router.replace('/pay');
+  router.replace({ path: "/pay", query: { orderId: orderNumber.value } });
 };
 
 const next = () => {
@@ -97,21 +108,17 @@ const next = () => {
 };
 onMounted(() => {});
 
-const fetchSteps = () => {
-  // 模拟数据示例
-  stepList.value = [
-    { title: "提交订单", content: "时间详情" },
-    { title: "订单审核中", content: "时间详情" },
-    { title: "待接单", content: "时间详情" },
-    { title: "待上门", content: "时间详情" },
-    { title: "处理中", content: "时间详情" },
-    { title: "处理完成", content: "时间详情" },
-    { title: "待结算", content: "时间详情" },
-    { title: "质量回访", content: "时间详情" },
-  ];
-  // 假设当前活跃步骤是 "处理中"
-  activeStep.value = 6;
-  stepsFetched.value = true;
+const fetchSteps = async () => {
+  fetching.value = true;
+  const phone = Storage.get("phone");
+  const resp = await getflowStatus({ orderId: orderNumber.value, customerPhone: phone });
+  if (resp.code === 200) {
+    activeStep.value = resp.data.code;
+    stepsFetched.value = true;
+  } else {
+    showFailToast(resp.message || "发送失败");
+  }
+  fetching.value = false;
 };
 </script>
 

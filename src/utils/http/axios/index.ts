@@ -195,6 +195,9 @@ const transform: AxiosTransform = {
         : token
     }
     config.headers['ngrok-skip-browser-warning'] = 'true';
+    config.headers['Auth-Token'] = options.authenticationScheme
+    ? `${options.authenticationScheme} ${token}`
+    : token
     return config
   },
 
