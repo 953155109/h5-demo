@@ -35,16 +35,17 @@
 </template>
 
 <script setup lang="ts">
-import type { FormInstance } from "vant";
-import { showToast, showFailToast } from "vant";
+import type {FormInstance} from "vant";
+import {showToast, showFailToast} from "vant";
 import NavBar from "../pay/NavBar.vue";
-import { useUserStore } from "@/store/modules/user";
-import { getflowStatus } from "@/api/sms/sms";
-import { createStorage } from "@/utils/Storage";
-const Storage = createStorage({ storage: localStorage });
+import {useUserStore} from "@/store/modules/user";
+import {getflowStatus} from "@/api/sms/sms";
+import {createStorage} from "@/utils/Storage";
+
+const Storage = createStorage({storage: localStorage});
 const userStore = useUserStore();
 
-const { nickname } = userStore.getUserInfo;
+const {nickname} = userStore.getUserInfo;
 const formRef = ref<FormInstance>();
 
 const orderNumber = ref("");
@@ -100,18 +101,20 @@ const stepList = ref([
 const goToSettlement = () => {
   // 处理去结算的逻辑，例如跳转到结算页面或调用支付接口
   showToast("跳转到结算页面...");
-  router.replace({ path: "/pay", query: { orderId: orderNumber.value } });
+  router.replace({path: "/pay", query: {orderId: orderNumber.value}});
 };
 
 const next = () => {
   active.value++;
 };
-onMounted(() => {});
+onMounted(() => {
+});
 
 const fetchSteps = async () => {
   fetching.value = true;
   const phone = Storage.get("phone");
-  const resp = await getflowStatus({ orderId: orderNumber.value, customerPhone: phone });
+  const resp = await getflowStatus({orderId: orderNumber.value, customerPhone: phone});
+
   if (resp.code === 200) {
     activeStep.value = resp.data.code;
     stepsFetched.value = true;
@@ -124,11 +127,12 @@ const fetchSteps = async () => {
 
 <style scoped lang="less">
 .step-box {
-  /deep/.van-step__title {
+  /deep/ .van-step__title {
     display: flex;
     align-items: center;
   }
 }
+
 .note {
   color: var(--van-text-color-2);
 }

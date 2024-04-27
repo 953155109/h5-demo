@@ -201,6 +201,16 @@ const transform: AxiosTransform = {
     return config
   },
 
+  responseInterceptors: (res) => {
+    const {code} = res.data;
+    if (code === 401) {
+      showFailToast('凭证过期,请重新登陆');
+      router.replace('/login')
+      throw new Error('Operation canceled due to unauthorized.');
+    }
+    return res;
+  },
+
   /**
    * @description: 响应错误处理
    */
@@ -240,6 +250,8 @@ const transform: AxiosTransform = {
     return Promise.reject(response?.data)
   },
 }
+
+
 
 function createAxios(opt?: Partial<CreateAxiosOptions>) {
   return new VAxios(
