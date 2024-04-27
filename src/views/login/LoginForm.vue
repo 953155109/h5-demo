@@ -4,7 +4,7 @@
  * @Author: EVE
  * @Date: 2024-04-24 23:45:51
  * @LastEditors: EVE
- * @LastEditTime: 2024-04-25 23:04:15
+ * @LastEditTime: 2024-04-27 16:03:54
 -->
 <template>
   <van-form v-if="getShow" ref="formRef" class="flex flex-col items-center" @submit="handleSubmit">
@@ -105,7 +105,7 @@ const route = useRoute();
 const formRef = ref<FormInstance>();
 const loading = ref(false);
 const formData = reactive({
-  userPhone: "11133322111",
+  userPhone: "13825080826",
   password: "123456",
   sms: "",
 });
@@ -128,12 +128,16 @@ const handleSendSMS = async () => {
   // 在这里添加发送验证码的逻辑
   // 发送验证码成功后，启动倒计时
   const customerPhone = formData.userPhone;
-  const ecPhone = encryptData({ customerPhone });
+  const ecPhone = encryptData(customerPhone);
   const resp = await getSmsCode({
     customerPhone: ecPhone,
   });
   console.log(resp, `resp`);
-  startCountdown();
+  if (resp.code == 200) {
+    startCountdown();
+  } else {
+    showFailToast(resp.message || "发送失败");
+  }
 };
 
 function handleSubmit() {
@@ -144,11 +148,14 @@ function handleSubmit() {
         loading.value = true;
         // showLoadingToast('登录中...')
         const { code, message: msg } = await userStore.Login({
-          customerPhone: formData.userPhone,
-          code: formData.sms,
+          customerPhone: encryptData(formData.userPhone),
+          code: encryptData(formData.sms),
         });
-        if (code === ResultEnum.SUCCESS) {
+        console.log(code, msg, `code, msg`,ResultEnum,ResultEnum.SUCCESS);
+        if (code == ResultEnum.SUCCESS) {
+          console.log(`进入`)
           const toPath = decodeURIComponent((route.query?.redirect || "/") as string);
+          console.log(toPath, `toPath`,route.name);
           // showSuccessToast('登录成功，即将进入系统')
           if (route.name === PageEnum.BASE_LOGIN_NAME) {
             await router.replace("/");
@@ -162,8 +169,8 @@ function handleSubmit() {
         loading.value = false;
       }
     })
-    .catch(() => {
-      console.error("验证失败");
+    .catch((err) => {
+      console.error("验证失败",err);
     });
 }
 

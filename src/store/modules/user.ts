@@ -65,10 +65,11 @@ export const useUserStore = defineStore({
     async Login(params: LoginParams) {
       try {
         const response = await login(params)
-        const { result, code } = response
+        console.log(response,2312321)
+        const { data, code } = response
         if (code === ResultEnum.SUCCESS) {
           // save token
-          this.setToken(result.token)
+          this.setToken(data.token)
         }
         return Promise.resolve(response)
       }
