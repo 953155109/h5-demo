@@ -57,3 +57,53 @@ export function changePassword(params: any, uid: any) {
     },
   )
 }
+/**
+ * @description: 获取流程信息
+ */
+export function getflowStatus(params: any) {
+  return http.request(
+    {
+      url: `/workflow/queryWorkflowStatus`,
+      method: 'POST',
+      params,
+    },
+    {
+      isTransformResponse: false,
+    },
+  )
+}
+
+/**
+ * @description: 获取订单信息
+ */
+export function getOrder(params: any) {
+  return http.request(
+    {
+      url: `/order/queryOrder`,
+      method: 'POST',
+      params,
+    },
+    {
+      isTransformResponse: false,
+    },
+  )
+}
+
+/**
+ * @description: 获取微信支付信息
+ */
+export function getWxpay(params: any) {
+  return http.request(
+    {
+      url: `/wxPay/prepay`,
+      method: 'POST',
+      params,
+    },
+    {
+      isTransformResponse: false,
+    },
+  )
+}
+
+
+/wxPay/prepay
