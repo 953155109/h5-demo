@@ -178,6 +178,7 @@ const transform: AxiosTransform = {
         config.params = undefined
       }
     }
+
     return config
   },
 
@@ -194,10 +195,15 @@ const transform: AxiosTransform = {
         ? `${options.authenticationScheme} ${token}`
         : token
     }
+    if (!config.headers) {
+      config.headers = {}; // 初始化为空对象
+    }
+
     config.headers['ngrok-skip-browser-warning'] = 'true';
     config.headers['Auth-Token'] = options.authenticationScheme
     ? `${options.authenticationScheme} ${token}`
     : token
+
     return config
   },
 
@@ -206,7 +212,7 @@ const transform: AxiosTransform = {
     if (code === 401) {
       showFailToast('凭证过期,请重新登陆');
       router.replace('/login')
-      throw new Error('Operation canceled due to unauthorized.');
+      throw new axios.Cancel('Operation canceled due to unauthorized.');
     }
     return res;
   },

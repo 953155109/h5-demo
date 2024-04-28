@@ -101,7 +101,7 @@ const stepList = ref([
 const goToSettlement = () => {
   // 处理去结算的逻辑，例如跳转到结算页面或调用支付接口
   showToast("跳转到结算页面...");
-  router.replace({path: "/pay", query: {orderId: orderNumber.value}});
+  router.push({path: "/pay", query: {orderId: orderNumber.value}});
 };
 
 const next = () => {

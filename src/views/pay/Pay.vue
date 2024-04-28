@@ -111,7 +111,7 @@ const getWXPayMessage = async () => {
     orderPrice: totalPrice.value, // 订单价格  订单详情里面的orderPrice
     description: "", // 订单描述 给空就行
     orderId: orderId, // 订单id  订单详情的ID
-    openId: "", //用户openId
+    openId: "oi6Q96-taCoH-dLf1eYdeNpb55Z0", //用户openId
     paymentType: 1, //支付类型  写死
   });
   loading.value = false;
