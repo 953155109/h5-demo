@@ -172,11 +172,36 @@ const getOrderMessage = async () => {
   }
 };
 
+
+const getUserOpenId = ()=>{
+  // var wxCode = ;
+ /* if (!wxCode) {
+    const appId = "wx668a7d9188ea21c5";
+    const redirect = encodeURIComponent(window.location.href);
+    window.location.href="https://open.weixin.qq.com/connect/oauth2/authorize?appid="+appId+"&redirect_uri="+redirect+"&response_type=code&scope=snsapi_base&state=123#wechat_redirect"
+  }*/
+
+
+}
+
 const onSubmit = async () => {
+
+/*
+  const appId = "wx668a7d9188ea21c5";
+  const redirect = encodeURIComponent(window.location.href);
+  alert(redirect)
+  window.location.href="https://open.weixin.qq.com/connect/oauth2/authorize?appid="+appId+"&redirect_uri="+redirect+"&response_type=code&scope=snsapi_base&state=123#wechat_redirect"
+
+*/
+
+
   if (!isWeiXin) {
     showToast("请在微信打开此页面进行支付");
     return;
   }
+
+  // getUserOpenId();
+
   await getWXPayMessage();
   if (typeof WeixinJSBridge == "undefined") {
     if (document.addEventListener) {
