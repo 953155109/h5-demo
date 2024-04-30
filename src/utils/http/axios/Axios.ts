@@ -71,7 +71,7 @@ export class VAxios {
     conf.requestOptions = opt
     // 支持 FormData
     conf = this.supportFormData(conf)
-    alert(conf.url)
+
     return new Promise((resolve, reject) => {
       this.axiosInstance
         .request<any, AxiosResponse<Result>>(conf)

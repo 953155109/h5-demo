@@ -7,7 +7,8 @@ import 'vant/es/image-preview/style'
 // https://unocss.dev/guide/style-reset#tailwind-compat
 // 此重置基于 Tailwind 重置，减去按钮的背景颜色覆盖，以避免与 UI 框架发生冲突。请参阅链接的问题。
 import '@unocss/reset/tailwind-compat.css'
-
+import { Dialog } from 'vant';
+import 'vant/lib/index.css';
 // Register icon sprite
 import 'virtual:svg-icons-register'
 import { createApp } from 'vue'
@@ -22,6 +23,7 @@ async function bootstrap() {
   // 挂载路由
   setupRouter(app)
   await router.isReady()
+  app.use(Dialog);
   // 路由准备就绪后挂载APP实例
   app.mount('#app', true)
 }

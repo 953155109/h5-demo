@@ -34,28 +34,33 @@
           <span class="total-price">¥{{ totalPrice }}</span>
         </div>
       </div>
+      <div v-if="payStatus === 1" class="paid-message">
+        已支付
+      </div>
     </div>
     <div class="logo-container" style="width: calc(100% - 40px); margin: 20px">
       <img src="/logo2.jpg" alt="Company Logo" class="logo"/>
     </div>
-    <van-submit-bar
-      :price="totalPrice * 100"
-      button-text="微信支付"
-      @submit="onSubmit"
-      class="wechat-pay"
+    <van-submit-bar v-if="payStatus !== 1"
+                    :price="totalPrice * 100"
+                    button-text="微信支付"
+                    @submit="onSubmit"
+                    class="wechat-pay"
     />
   </div>
 </template>
 
 <script setup lang="ts">
 import {useRoute} from "vue-router";
-import type {FormInstance} from "vant";
+import {FormInstance, showConfirmDialog, showDialog} from "vant";
 import {showFailToast} from "vant";
 import {showToast} from "vant";
 import NavBar from "./NavBar.vue";
 import {useUserStore} from "@/store/modules/user";
-import {getOrder, getWxpay} from "@/api/sms/sms";
+import {getOrder, getPayStatus, getWxpay} from "@/api/sms/sms";
 import {createStorage} from "@/utils/Storage";
+import {Dialog} from 'vant';
+import 'vant/lib/index.css';
 
 const Storage = createStorage({storage: localStorage});
 
@@ -68,6 +73,7 @@ const loading = ref(false);
 const orderItems = ref([]);
 
 const totalPrice = ref(0);
+const payStatus = ref(0);
 const wxPayMessage = ref({
   appId: "",
   nonceStr: "",
@@ -97,12 +103,40 @@ function onBridgeReady() {
     },
     function (res) {
       if (res.err_msg == "get_brand_wcpay_request:ok") {
-        console.log("支付成功");
-        //res.err_msg将在用户支付成功后返回ok，但并不保证它绝对可靠。
+        showConfirmDialog({
+          title: '支付完成?',
+          // message: '支付完成？',
+          confirmButtonText: "已支付",
+          cancelButtonText: '未支付'
+        })
+          .then(() => {
+
+            getWXPayResult();
+          })
+          .catch(() => {
+            alert("未支付 弹窗测试")
+          });
       }
     }
   );
 }
+
+const getWXPayResult = async () => {
+  loading.value = true;
+  const resp = await getPayStatus({
+    orderId: orderId, // 订单id  订单详情的ID
+  });
+  loading.value = false;
+  if (resp.code === 200) {
+    loading.value = true; // 显示加载状态
+    setTimeout(() => {
+      loading.value = false; // 完成后隐藏加载状态
+    }, 2000);
+    window.location.reload();
+  } else {
+    showFailToast(resp.message);
+  }
+};
 
 // 获取微信支付信息
 const getWXPayMessage = async () => {
@@ -132,12 +166,17 @@ const getOrderMessage = async () => {
   if (resp.code === 200) {
     orderItems.value = resp.data.goodsInfoDTO;
     totalPrice.value = resp.data.orderPrice;
+    payStatus.value = resp.data.paymentStatus;
   } else {
     showFailToast(resp.message || "发送失败");
   }
 };
 
 const onSubmit = async () => {
+  if (!isWeiXin) {
+    showToast("请在微信打开此页面进行支付");
+    return;
+  }
   await getWXPayMessage();
   if (typeof WeixinJSBridge == "undefined") {
     if (document.addEventListener) {

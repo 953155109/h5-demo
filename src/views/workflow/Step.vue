@@ -23,10 +23,15 @@
     <!-- 根据查询结果显示进度条 -->
     <van-steps v-if="stepsFetched" direction="vertical" :active="activeStep">
       <van-step v-for="(item, index) in stepList" :key="index">
-        {{ item.title }}
-        <template v-if="item.title === '待结算' && index === activeStep">
+        {{ paymentStatus === 1 && item.title === '待结算' ? '已支付' : item.title }}
+        <template v-if="item.title === '待结算' && index === activeStep && paymentStatus !== 1">
           <van-button class="settlement-button" type="default" size="mini" @click="goToSettlement">
             去结算
+          </van-button>
+        </template>
+        <template v-if="item.title === '待结算' && index === activeStep && paymentStatus === 1">
+          <van-button class="settlement-button" type="default" size="mini" @click="goToSettlement">
+            订单详情
           </van-button>
         </template>
       </van-step>
@@ -50,6 +55,7 @@ const formRef = ref<FormInstance>();
 
 const orderNumber = ref("");
 const activeStep = ref(0);
+const paymentStatus = ref(0);
 const stepsFetched = ref(false);
 const fetching = ref(false);
 
@@ -117,6 +123,7 @@ const fetchSteps = async () => {
 
   if (resp.code === 200) {
     activeStep.value = resp.data.code;
+    paymentStatus.value = resp.data.paymentStatus;
     stepsFetched.value = true;
   } else {
     showFailToast(resp.message || "发送失败");

@@ -104,3 +104,16 @@ export function getWxpay(params: any) {
     },
   )
 }
+
+export function getPayStatus(params: any) {
+  return http.request(
+    {
+      url: `/wxPay/callBack`,
+      method: 'POST',
+      params,
+    },
+    {
+      isTransformResponse: false,
+    },
+  )
+}
