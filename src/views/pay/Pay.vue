@@ -57,7 +57,7 @@ import {showFailToast} from "vant";
 import {showToast} from "vant";
 import NavBar from "./NavBar.vue";
 import {useUserStore} from "@/store/modules/user";
-import {getOrder, getPayStatus, getWxpay} from "@/api/sms/sms";
+import {getOrder, getPayStatus, getWxOpenId, getWxpay} from "@/api/sms/sms";
 import {createStorage} from "@/utils/Storage";
 import {Dialog} from 'vant';
 import 'vant/lib/index.css';
@@ -67,13 +67,11 @@ const Storage = createStorage({storage: localStorage});
 const userStore = useUserStore();
 const route = useRoute();
 const orderId = route.query.orderId;
-const {nickname} = userStore.getUserInfo;
-const formRef = ref<FormInstance>();
 const loading = ref(false);
 const orderItems = ref([]);
-
 const totalPrice = ref(0);
 const payStatus = ref(0);
+const code = ref('123');
 const wxPayMessage = ref({
   appId: "",
   nonceStr: "",
@@ -82,12 +80,9 @@ const wxPayMessage = ref({
   paySign: "",
   timeStamp: "",
 });
-
+// 0.01579
 const ua = navigator.userAgent.toLowerCase();
 const isWeiXin = ua.indexOf("micromessenger") != -1;
-const local = encodeURIComponent(
-  "https://5d51-2409-8a44-8676-8a70-3daa-5e30-e287-4f1b.ngrok-free.app/#/pay"
-);
 
 function onBridgeReady() {
   const {appId, nonceStr, packageVal, signType, paySign, timeStamp} = wxPayMessage.value;
@@ -110,7 +105,6 @@ function onBridgeReady() {
           cancelButtonText: '未支付'
         })
           .then(() => {
-
             getWXPayResult();
           })
           .catch(() => {
@@ -145,7 +139,7 @@ const getWXPayMessage = async () => {
     orderPrice: totalPrice.value, // 订单价格  订单详情里面的orderPrice
     description: "", // 订单描述 给空就行
     orderId: orderId, // 订单id  订单详情的ID
-    openId: "oi6Q96-taCoH-dLf1eYdeNpb55Z0", //用户openId
+    openId: userStore.getUserOpenId, //用户openId
     paymentType: 1, //支付类型  写死
   });
   loading.value = false;
@@ -154,6 +148,20 @@ const getWXPayMessage = async () => {
   } else {
     showFailToast(resp.message || "发送失败");
     throw Error("请求支付参数失败");
+  }
+};
+// 获取用户openId
+const getWXUserOpenId = async () => {
+  const phone = Storage.get("phone");
+  const resp = await getWxOpenId({
+    code: code.value,
+    customerPhone: phone,
+  });
+  if (resp.code === 200) {
+    userStore.setOpenId(resp.data)
+  } else {
+    showFailToast(resp.message || "微信OpenId获取失败");
+    throw Error("微信OpenId获取失败");
   }
 };
 
@@ -173,34 +181,34 @@ const getOrderMessage = async () => {
 };
 
 
-const getUserOpenId = ()=>{
-  // var wxCode = ;
- /* if (!wxCode) {
-    const appId = "wx668a7d9188ea21c5";
-    const redirect = encodeURIComponent(window.location.href);
-    window.location.href="https://open.weixin.qq.com/connect/oauth2/authorize?appid="+appId+"&redirect_uri="+redirect+"&response_type=code&scope=snsapi_base&state=123#wechat_redirect"
-  }*/
+const getUserOpenId = async () => {
+  const openId = userStore.getUserOpenId;
 
+  if (openId) {
+    return;
+  }
 
+  if (code.value) {
+    await getWXUserOpenId();
+    return;
+  }
+  const appId = "wx668a7d9188ea21c5";
+  const redirect = encodeURIComponent(window.location.href);
+  window.location.href = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=" + appId + "&redirect_uri=" + redirect + "&response_type=code&scope=snsapi_base&state=123#wechat_redirect";
 }
 
 const onSubmit = async () => {
-
-/*
-  const appId = "wx668a7d9188ea21c5";
-  const redirect = encodeURIComponent(window.location.href);
-  alert(redirect)
-  window.location.href="https://open.weixin.qq.com/connect/oauth2/authorize?appid="+appId+"&redirect_uri="+redirect+"&response_type=code&scope=snsapi_base&state=123#wechat_redirect"
-
-*/
-
 
   if (!isWeiXin) {
     showToast("请在微信打开此页面进行支付");
     return;
   }
 
-  // getUserOpenId();
+  await getUserOpenId();
+
+  if (!userStore.getUserOpenId) {
+    return;
+  }
 
   await getWXPayMessage();
   if (typeof WeixinJSBridge == "undefined") {
@@ -216,15 +224,20 @@ const onSubmit = async () => {
   showToast("提交成功");
 };
 
-// /v3/pay/transactions/jsapi   预支付 获取  prepay_id 有效期为2小时
-
-// 参数
-// appid 公众号ID  wx668a7d9188ea21c5
-// mchid  直连商户号 1674688120
-// openid  普通商户AppID下的唯一标识 oi6Q96-taCoH-dLf1eYdeNpb55Z0
-// sing: 商户私钥
 onMounted(() => {
   getOrderMessage();
+
+  if (isWeiXin) {
+    if (!code.value) {
+      const parsedUrl = new URL(window.location.href);
+      if (parsedUrl.searchParams.has('code')) {
+        // 如果存在，获取 "code" 参数
+        code.value = parsedUrl.searchParams.get('code') || '';
+      }
+    }
+    getUserOpenId();
+  }
+
 });
 </script>
 

@@ -105,6 +105,19 @@ export function getWxpay(params: any) {
   )
 }
 
+export function getWxOpenId(params: any) {
+  return http.request(
+    {
+      url: `/wx/getOpenId`,
+      method: 'POST',
+      params,
+    },
+    {
+      isTransformResponse: false,
+    },
+  )
+}
+
 export function getPayStatus(params: any) {
   return http.request(
     {

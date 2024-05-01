@@ -1,13 +1,13 @@
-import { defineStore } from 'pinia'
-import { createStorage } from '@/utils/Storage'
-import { store } from '@/store'
-import { ACCESS_TOKEN, CURRENT_USER } from '@/store/mutation-types'
-import { ResultEnum } from '@/enums/httpEnum'
-import { doLogout, getUserInfo, login } from '@/api/system/user'
-import { PageEnum } from '@/enums/pageEnum'
+import {defineStore} from 'pinia'
+import {createStorage} from '@/utils/Storage'
+import {store} from '@/store'
+import {ACCESS_TOKEN, CURRENT_USER, USER_OPEN_ID} from '@/store/mutation-types'
+import {ResultEnum} from '@/enums/httpEnum'
+import {doLogout, getUserInfo, login} from '@/api/system/user'
+import {PageEnum} from '@/enums/pageEnum'
 import router from '@/router'
 
-const Storage = createStorage({ storage: localStorage })
+const Storage = createStorage({storage: localStorage})
 
 interface UserInfo {
   userId: string | number
@@ -24,6 +24,7 @@ interface UserInfo {
 
 interface IUserState {
   token?: string
+  openId?: string
   userInfo: Nullable<UserInfo>
   lastUpdateTime: number
 }
@@ -38,6 +39,7 @@ export const useUserStore = defineStore({
   state: (): IUserState => ({
     userInfo: null,
     token: undefined,
+    openId: undefined,
     lastUpdateTime: 0,
   }),
   getters: {
@@ -46,6 +48,9 @@ export const useUserStore = defineStore({
     },
     getToken(): string {
       return this.token || Storage.get(ACCESS_TOKEN, '')
+    },
+    getUserOpenId(): string {
+      return this.openId || Storage.get(USER_OPEN_ID, '')
     },
     getLastUpdateTime(): number {
       return this.lastUpdateTime
@@ -56,6 +61,10 @@ export const useUserStore = defineStore({
       this.token = token || ''
       Storage.set(ACCESS_TOKEN, token)
     },
+    setOpenId(openId: string | undefined) {
+      this.openId = openId || ''
+      Storage.set(USER_OPEN_ID, openId)
+    },
     setUserInfo(info: UserInfo | null) {
       this.userInfo = info
       this.lastUpdateTime = new Date().getTime()
@@ -65,14 +74,14 @@ export const useUserStore = defineStore({
     async Login(params: LoginParams) {
       try {
         const response = await login(params)
-        const { data, code } = response
+        const {data, code} = response
         if (code === ResultEnum.SUCCESS) {
           // save token
-          this.setToken(data)
+          this.setToken(data.token);
+          this.setOpenId(data.openId);
         }
         return Promise.resolve(response)
-      }
-      catch (error) {
+      } catch (error) {
         return Promise.reject(error)
       }
     },
@@ -94,14 +103,15 @@ export const useUserStore = defineStore({
       if (this.getToken) {
         try {
           await doLogout()
-        }
-        catch {
+        } catch {
           console.error('注销Token失败')
         }
       }
       this.setToken(undefined)
+      this.setOpenId(undefined)
       this.setUserInfo(null)
       Storage.remove(ACCESS_TOKEN)
+      Storage.remove(USER_OPEN_ID)
       Storage.remove(CURRENT_USER)
       router.push(PageEnum.BASE_LOGIN)
       location.reload()

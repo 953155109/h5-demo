@@ -1,6 +1,6 @@
 <!--
- * @Descripttion: 
- * @version: 
+ * @Descripttion:
+ * @version:
  * @Author: EVE
  * @Date: 2024-04-24 23:45:51
  * @LastEditors: EVE
@@ -153,10 +153,9 @@ function handleSubmit() {
           customerPhone: encryptData(formData.userPhone),
           code: encryptData(formData.sms),
         });
-        Storage.get("phone", formData.userPhone);
+        Storage.set("phone", formData.userPhone);
         if (code == ResultEnum.SUCCESS) {
           const toPath = decodeURIComponent((route.query?.redirect || "/") as string);
-          console.log(toPath, `toPath`, route.name);
           // showSuccessToast('登录成功，即将进入系统')
           if (route.name === PageEnum.BASE_LOGIN_NAME) {
             await router.replace("/");
