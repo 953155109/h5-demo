@@ -71,7 +71,7 @@ const loading = ref(false);
 const orderItems = ref([]);
 const totalPrice = ref(0);
 const payStatus = ref(0);
-const code = ref('123');
+const code = ref('');
 const wxPayMessage = ref({
   appId: "",
   nonceStr: "",
