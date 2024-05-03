@@ -1,9 +1,9 @@
-import { http } from '@/utils/http/axios'
+import { http } from "@/utils/http/axios";
 
 export interface BasicResponseModel<T = any> {
-  code: number
-  message: string
-  data: T
+  code: number;
+  message: string;
+  data: T;
 }
 
 /**
@@ -12,14 +12,14 @@ export interface BasicResponseModel<T = any> {
 export function getSmsCode(params: any) {
   return http.request<BasicResponseModel>(
     {
-      url: '/sms/getCode',
-      method: 'GET',
+      url: "/sms/getCode",
+      method: "GET",
       params,
     },
     {
       isTransformResponse: false,
-    },
-  )
+    }
+  );
 }
 
 /**
@@ -27,9 +27,9 @@ export function getSmsCode(params: any) {
  */
 export function getUserInfo() {
   return http.request({
-    url: '/getUserInfo',
-    method: 'get',
-  })
+    url: "/getUserInfo",
+    method: "get",
+  });
 }
 
 /**
@@ -37,9 +37,9 @@ export function getUserInfo() {
  */
 export function doLogout() {
   return http.request({
-    url: '/logout',
-    method: 'POST',
-  })
+    url: "/logout",
+    method: "POST",
+  });
 }
 
 /**
@@ -49,13 +49,13 @@ export function changePassword(params: any, uid: any) {
   return http.request(
     {
       url: `/user/u${uid}/changepw`,
-      method: 'POST',
+      method: "POST",
       params,
     },
     {
       isTransformResponse: false,
-    },
-  )
+    }
+  );
 }
 /**
  * @description: 获取流程信息
@@ -64,13 +64,13 @@ export function getflowStatus(params: any) {
   return http.request(
     {
       url: `/workflow/queryWorkflowStatus`,
-      method: 'POST',
+      method: "POST",
       params,
     },
     {
       isTransformResponse: false,
-    },
-  )
+    }
+  );
 }
 
 /**
@@ -80,30 +80,33 @@ export function Postform(params: any) {
   return http.request(
     {
       url: `/workflow/order`,
-      method: 'POST',
+      method: "POST",
       params,
     },
     {
       isTransformResponse: false,
-    },
-  )
+    }
+  );
 }
-
 
 /**
  * @description: 获取订单信息
  */
-export function getOrder(params: any) {
+export function getOrder(params: any, headers: any) {
   return http.request(
     {
+      headers: {
+        tempToken: headers.tempToken,
+        customerPhone: headers.customerPhone,
+      },
       url: `/order/queryOrder`,
-      method: 'POST',
+      method: "POST",
       params,
     },
     {
       isTransformResponse: false,
-    },
-  )
+    }
+  );
 }
 
 /**
@@ -113,37 +116,37 @@ export function getWxpay(params: any) {
   return http.request(
     {
       url: `/wxPay/prepay`,
-      method: 'POST',
+      method: "POST",
       params,
     },
     {
       isTransformResponse: false,
-    },
-  )
+    }
+  );
 }
 
 export function getWxOpenId(params: any) {
   return http.request(
     {
       url: `/wx/getOpenId`,
-      method: 'POST',
+      method: "POST",
       params,
     },
     {
       isTransformResponse: false,
-    },
-  )
+    }
+  );
 }
 
 export function getPayStatus(params: any) {
   return http.request(
     {
       url: `/wxPay/callBack`,
-      method: 'POST',
+      method: "POST",
       params,
     },
     {
       isTransformResponse: false,
-    },
-  )
+    }
+  );
 }

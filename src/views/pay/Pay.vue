@@ -4,7 +4,7 @@
  * @Author: EVE
  * @Date: 2024-04-20 20:40:02
  * @LastEditors: EVE
- * @LastEditTime: 2024-05-03 21:04:58
+ * @LastEditTime: 2024-05-03 22:23:30
 -->
 <template>
   <div>
@@ -165,9 +165,12 @@ const getWXUserOpenId = async () => {
 };
 
 // 获取订单信息
-const getOrderMessage = async () => {
+const getOrderMessage = async (tempToken) => {
   loading.value = true;
-  const resp = await getOrder({ orderId: orderId, customerPhone: phone });
+  const resp = await getOrder(
+    { orderId: orderId, customerPhone: phone },
+    { tempToken, customerPhone: phone }
+  );
   loading.value = false;
   if (resp.code === 200) {
     orderItems.value = resp.data.goodsInfoDTO;
@@ -229,7 +232,8 @@ onMounted(() => {
   // 获取当前页面的 URL
   const currentUrl = window.location.href;
   // 解析 URL 中的参数
-  const urlParams = new URLSearchParams(currentUrl);
+  const queryString = currentUrl.split("?")[1];
+  const urlParams = new URLSearchParams(queryString);
   // 获取 URL 中的 from 参数，如果存在且值为 swy_server，则表示是从连接跳转的
   const isFromSwyServer = urlParams.get("from") === "swy_server";
   // 如果是从连接跳转的，则获取并设置 customerPhone 和 tempToken
@@ -238,12 +242,7 @@ onMounted(() => {
     openId = urlParams.get("openId") || "";
     const tempToken = urlParams.get("Temp-Token");
     orderId = urlParams.get("orderId") || "";
-
-    // 发送请求时将 tempToken 和 customerPhone 添加到请求头中
-    // 假设您使用的是 Axios
-    // axios.defaults.headers.common["Temp-Token"] = tempToken;
-    // axios.defaults.headers.common["customerPhone"] = customerPhone;
-    getOrderMessage();
+    getOrderMessage(tempToken);
   } else {
     orderId = route.query.orderId || "";
     getOrderMessage();
