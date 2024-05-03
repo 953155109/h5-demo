@@ -74,6 +74,23 @@ export function getflowStatus(params: any) {
 }
 
 /**
+ * @description: 表单请求
+ */
+export function Postform(params: any) {
+  return http.request(
+    {
+      url: `/workflow/order`,
+      method: 'POST',
+      params,
+    },
+    {
+      isTransformResponse: false,
+    },
+  )
+}
+
+
+/**
  * @description: 获取订单信息
  */
 export function getOrder(params: any) {

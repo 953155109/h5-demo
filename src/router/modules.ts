@@ -118,10 +118,19 @@ const routeModuleList: Array<RouteRecordRaw> = [
     path: '/step',
     name: 'step',
     meta: {
-      title: '流程',
+      title: '',
       innerPage: true,
     },
     component: () => import('@/views/workflow/Step.vue'),
+  },
+  {
+    path: '/form',
+    name: 'form',
+    meta: {
+      title: '',
+      innerPage: true,
+    },
+    component: () => import('@/views/workflow/form.vue'),
   },
   {
     path: '/editSign',

@@ -4,53 +4,78 @@
  * @Author: EVE
  * @Date: 2024-04-20 20:40:02
  * @LastEditors: EVE
- * @LastEditTime: 2024-04-27 18:52:09
+ * @LastEditTime: 2024-05-03 14:40:59
 -->
 <template>
   <div class="step-box">
-    <NavBar>
-      <template #right></template>
-    </NavBar>
     <!-- 输入订单号 -->
-    <van-field v-model="orderNumber" placeholder="请输入订单号" button-slot>
-      <template #button>
-        <van-button type="primary" @click="fetchSteps" :loading="fetching">查询</van-button>
-      </template>
-    </van-field>
-    <!-- 查询按钮 -->
-    <!--    <van-button type="primary" @click="fetchSteps">查询</van-button>-->
+    <div style="display: flex; justify-content: center; margin-top: 20px; height: 56px">
+      <van-button type="primary" @click="goToForm">下单</van-button>
+    </div>
+    <div style="min-height: calc(100vh - 56px); padding-bottom: 20px">
+      <van-pull-refresh v-model="refreshing" @refresh="onRefresh">
+        <van-list
+          style="height: 100%; overflow: auto"
+          v-model:loading="stepsFetched"
+          :finished="finished"
+          finished-text="没有更多了"
+        >
+          <van-cell v-for="item in orderList" :key="item.orderId">
+            <template #title>
+              <li>订单编号：{{ item.orderId }}</li>
+              <li>维修类型：{{ item.repairType }}</li>
+              <li>受理时间：{{ item.acceptTime }}</li>
+              <van-steps direction="vertical" :active="item.code">
+                <van-step v-for="(step, index) in stepList" :key="index">
+                  {{ item.code === 1 && step.title === "待结算" ? "已支付" : step.title }}
+                  <template
+                    v-if="step.title === '待结算' && index === item.code && item.code !== 1"
+                  >
+                    <van-button
+                      class="settlement-button"
+                      type="default"
+                      size="mini"
+                      @click="goToSettlement(item.orderId)"
+                    >
+                      去结算
+                    </van-button>
+                  </template>
+                  <template
+                    v-if="step.title === '待结算' && index === item.code && item.code === 1"
+                  >
+                    <van-button
+                      class="settlement-button"
+                      type="default"
+                      size="mini"
+                      @click="goToSettlement(item.orderId)"
+                    >
+                      订单详情
+                    </van-button>
+                  </template>
+                </van-step>
+              </van-steps>
+            </template>
+          </van-cell>
+        </van-list>
+      </van-pull-refresh>
+    </div>
 
     <!-- 根据查询结果显示进度条 -->
-    <van-steps v-if="stepsFetched" direction="vertical" :active="activeStep">
-      <van-step v-for="(item, index) in stepList" :key="index">
-        {{ paymentStatus === 1 && item.title === '待结算' ? '已支付' : item.title }}
-        <template v-if="item.title === '待结算' && index === activeStep && paymentStatus !== 1">
-          <van-button class="settlement-button" type="default" size="mini" @click="goToSettlement">
-            去结算
-          </van-button>
-        </template>
-        <template v-if="item.title === '待结算' && index === activeStep && paymentStatus === 1">
-          <van-button class="settlement-button" type="default" size="mini" @click="goToSettlement">
-            订单详情
-          </van-button>
-        </template>
-      </van-step>
-    </van-steps>
   </div>
 </template>
 
 <script setup lang="ts">
-import type {FormInstance} from "vant";
-import {showToast, showFailToast} from "vant";
+import type { FormInstance, List } from "vant";
+import { showToast, showFailToast } from "vant";
 import NavBar from "../pay/NavBar.vue";
-import {useUserStore} from "@/store/modules/user";
-import {getflowStatus} from "@/api/sms/sms";
-import {createStorage} from "@/utils/Storage";
+import { useUserStore } from "@/store/modules/user";
+import { getflowStatus } from "@/api/sms/sms";
+import { createStorage } from "@/utils/Storage";
 
-const Storage = createStorage({storage: localStorage});
+const Storage = createStorage({ storage: localStorage });
 const userStore = useUserStore();
 
-const {nickname} = userStore.getUserInfo;
+const { nickname } = userStore.getUserInfo;
 const formRef = ref<FormInstance>();
 
 const orderNumber = ref("");
@@ -58,6 +83,21 @@ const activeStep = ref(0);
 const paymentStatus = ref(0);
 const stepsFetched = ref(false);
 const fetching = ref(false);
+const refreshing = ref(false);
+const finished = ref(false);
+const pageSize = ref(5);
+const page = ref(1);
+const total = ref(0);
+interface Order {
+  code: number;
+  status: string;
+  orderId: string;
+  paymentStatus: number;
+  repairType: string;
+  acceptTime: string;
+}
+
+const orderList = ref<Order[]>([]);
 
 const router = useRouter();
 const active = ref(1);
@@ -104,31 +144,58 @@ const stepList = ref([
   },
 ]);
 
-const goToSettlement = () => {
+const goToSettlement = (orderId) => {
   // 处理去结算的逻辑，例如跳转到结算页面或调用支付接口
   showToast("跳转到结算页面...");
-  router.push({path: "/pay", query: {orderId: orderNumber.value}});
+  router.push({ path: "/pay", query: { orderId: orderId } });
+};
+const goToForm = () => {
+  showToast("跳转到下单页面...");
+  router.push({ path: "/form", query: {} });
 };
 
 const next = () => {
   active.value++;
 };
 onMounted(() => {
+  fetchSteps();
 });
+
+const onRefresh = () => {
+  if (!finished.value) {
+    pageSize.value += 5;
+    fetchSteps();
+  } else {
+    fetching.value = false;
+    refreshing.value = false;
+    stepsFetched.value = false;
+  }
+};
 
 const fetchSteps = async () => {
   fetching.value = true;
-  const phone = Storage.get("phone");
-  const resp = await getflowStatus({orderId: orderNumber.value, customerPhone: phone});
+  refreshing.value = true;
+  stepsFetched.value = true;
 
+  const phone = Storage.get("phone");
+  const resp = await getflowStatus({
+    pageSize: pageSize.value,
+    page: page.value,
+    customerPhone: phone,
+  });
   if (resp.code === 200) {
-    activeStep.value = resp.data.code;
-    paymentStatus.value = resp.data.paymentStatus;
-    stepsFetched.value = true;
+    console.log(resp.data);
+    orderList.value = resp.data.content;
+    total.value = resp.data.total;
+    if (orderList.value.length >= total.value) {
+      finished.value = true;
+    }
   } else {
     showFailToast(resp.message || "发送失败");
   }
   fetching.value = false;
+  refreshing.value = false;
+  stepsFetched.value = false;
 };
 </script>
 
@@ -137,6 +204,11 @@ const fetchSteps = async () => {
   /deep/ .van-step__title {
     display: flex;
     align-items: center;
+  }
+  /deep/ .van-cell .van-cell__title {
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 2px 12px;
+    border-radius: 8px;
+    padding: 15px;
   }
 }
 

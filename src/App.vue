@@ -1,7 +1,15 @@
+<!--
+ * @Descripttion: 
+ * @version: 
+ * @Author: EVE
+ * @Date: 2024-04-24 23:45:51
+ * @LastEditors: EVE
+ * @LastEditTime: 2024-05-03 13:57:46
+-->
 <template>
   <vanConfigProvider :theme-vars="getThemeVars()">
     <routerView v-slot="{ Component }">
-      <div class="absolute bottom-0 top-0 w-full overflow-hidden">
+      <div class="absolute bottom-0 top-0 w-full ">
         <transition :name="getTransitionName" mode="out-in" appear>
           <keep-alive v-if="keepAliveComponents" :include="keepAliveComponents">
             <component :is="Component" />
