@@ -4,15 +4,15 @@
  * @Author: EVE
  * @Date: 2024-04-20 20:40:02
  * @LastEditors: EVE
- * @LastEditTime: 2024-05-03 15:05:24
+ * @LastEditTime: 2024-05-03 20:32:55
 -->
 <template>
   <div class="step-box">
     <!-- 输入订单号 -->
-    <div style="display: flex; justify-content: center; margin-top: 20px; height: 56px">
+    <!-- <div style="display: flex; justify-content: center; margin-top: 20px; height: 56px">
       <van-button type="primary" @click="goToForm">下单</van-button>
-    </div>
-    <div style="min-height: calc(100vh - 56px); padding-bottom: 20px">
+    </div> -->
+    <div style="min-height: 100vh; padding-bottom: 40px">
       <van-pull-refresh v-model="refreshing" @refresh="onRefresh">
         <van-list
           style="height: 100%; overflow: auto"
@@ -25,16 +25,22 @@
               <li>维修类型：{{ item.repairType }}</li>
               <li>受理时间：{{ item.acceptTime }}</li>
               <div
-                style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                style="
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: center;
+                  width: 100%;
+                "
+              >
                 <span>
-                     <li>订单状态：{{ item.statusDesc }}</li>
+                  <li>订单状态：{{ item.statusDesc }}</li>
                 </span>
                 <van-button
                   v-if="item.status === 'settlement' && item.paymentStatus === 0"
                   class="settlement-button"
                   type="default"
                   size="mini"
-                  style="background-color: #1aad19; color: white;"
+                  style="background-color: #1aad19; color: white"
                   @click="goToSettlement(item.orderId)"
                 >
                   去结算
@@ -49,10 +55,14 @@
                   订单详情
                 </van-button>
               </div>
-              <van-button v-if="item.code !== 7" size="mini" type="primary"
-                          style="background-color: white; color: #333; border: 1px solid #ccc;"
-                          @click="item.isVisible = !item.isVisible">
-                {{ item.isVisible ? '隐藏流程' : '查看流程' }}
+              <van-button
+                v-if="item.code !== 7"
+                size="mini"
+                type="primary"
+                style="background-color: white; color: #333; border: 1px solid #ccc"
+                @click="item.isVisible = !item.isVisible"
+              >
+                {{ item.isVisible ? "隐藏流程" : "查看流程" }}
               </van-button>
               <van-steps v-if="item.isVisible" direction="vertical" :active="item.code">
                 <van-step v-for="(step, index) in stepList" :key="index">
@@ -62,23 +72,23 @@
             </template>
           </van-cell>
         </van-list>
-
       </van-pull-refresh>
     </div>
-
-    <!-- 根据查询结果显示进度条 -->
+    <div class="fixed-bottom">
+      <van-button block type="primary" @click="goToForm">下单</van-button>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import type {FormInstance, List} from "vant";
-import {showToast, showFailToast} from "vant";
+import type { FormInstance, List } from "vant";
+import { showToast, showFailToast } from "vant";
 import NavBar from "../pay/NavBar.vue";
-import {useUserStore} from "@/store/modules/user";
-import {getflowStatus} from "@/api/sms/sms";
-import {createStorage} from "@/utils/Storage";
+import { useUserStore } from "@/store/modules/user";
+import { getflowStatus } from "@/api/sms/sms";
+import { createStorage } from "@/utils/Storage";
 
-const Storage = createStorage({storage: localStorage});
+const Storage = createStorage({ storage: localStorage });
 const userStore = useUserStore();
 
 const formRef = ref<FormInstance>();
@@ -151,11 +161,11 @@ const stepList = ref([
 const goToSettlement = (orderId) => {
   // 处理去结算的逻辑，例如跳转到结算页面或调用支付接口
   showToast("跳转到结算页面...");
-  router.push({path: "/pay", query: {orderId: orderId}});
+  router.push({ path: "/pay", query: { orderId: orderId } });
 };
 const goToForm = () => {
   showToast("跳转到下单页面...");
-  router.push({path: "/form", query: {}});
+  router.push({ path: "/form", query: {} });
 };
 
 onMounted(() => {
@@ -214,7 +224,11 @@ const fetchSteps = async () => {
 .note {
   color: var(--van-text-color-2);
 }
-
+.fixed-bottom {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+}
 .settlement-button {
   background-color: #1aad19;
   color: white;
