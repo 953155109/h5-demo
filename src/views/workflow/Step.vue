@@ -24,38 +24,45 @@
               <li>订单编号：{{ item.orderId }}</li>
               <li>维修类型：{{ item.repairType }}</li>
               <li>受理时间：{{ item.acceptTime }}</li>
-              <van-steps direction="vertical" :active="item.code">
+              <div
+                style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                <span>
+                     <li>订单状态：{{ item.statusDesc }}</li>
+                </span>
+                <van-button
+                  v-if="item.status === 'settlement' && item.paymentStatus === 0"
+                  class="settlement-button"
+                  type="default"
+                  size="mini"
+                  style="background-color: #1aad19; color: white;"
+                  @click="goToSettlement(item.orderId)"
+                >
+                  去结算
+                </van-button>
+                <van-button
+                  v-if="item.paymentStatus === 1"
+                  class="settlement-button"
+                  type="default"
+                  size="mini"
+                  @click="goToSettlement(item.orderId)"
+                >
+                  订单详情
+                </van-button>
+              </div>
+              <van-button v-if="item.code !== 7" size="mini" type="primary"
+                          style="background-color: white; color: #333; border: 1px solid #ccc;"
+                          @click="item.isVisible = !item.isVisible">
+                {{ item.isVisible ? '隐藏流程' : '查看流程' }}
+              </van-button>
+              <van-steps v-if="item.isVisible" direction="vertical" :active="item.code">
                 <van-step v-for="(step, index) in stepList" :key="index">
-                  {{ item.code === 1 && step.title === "待结算" ? "已支付" : step.title }}
-                  <template
-                    v-if="step.title === '待结算' && index === item.code && item.code !== 1"
-                  >
-                    <van-button
-                      class="settlement-button"
-                      type="default"
-                      size="mini"
-                      @click="goToSettlement(item.orderId)"
-                    >
-                      去结算
-                    </van-button>
-                  </template>
-                  <template
-                    v-if="step.title === '待结算' && index === item.code && item.code === 1"
-                  >
-                    <van-button
-                      class="settlement-button"
-                      type="default"
-                      size="mini"
-                      @click="goToSettlement(item.orderId)"
-                    >
-                      订单详情
-                    </van-button>
-                  </template>
+                  {{ item.paymentStatus === 1 && step.title === "待结算" ? "已支付" : step.title }}
                 </van-step>
               </van-steps>
             </template>
           </van-cell>
         </van-list>
+
       </van-pull-refresh>
     </div>
 
@@ -64,14 +71,14 @@
 </template>
 
 <script setup lang="ts">
-import type { FormInstance, List } from "vant";
-import { showToast, showFailToast } from "vant";
+import type {FormInstance, List} from "vant";
+import {showToast, showFailToast} from "vant";
 import NavBar from "../pay/NavBar.vue";
-import { useUserStore } from "@/store/modules/user";
-import { getflowStatus } from "@/api/sms/sms";
-import { createStorage } from "@/utils/Storage";
+import {useUserStore} from "@/store/modules/user";
+import {getflowStatus} from "@/api/sms/sms";
+import {createStorage} from "@/utils/Storage";
 
-const Storage = createStorage({ storage: localStorage });
+const Storage = createStorage({storage: localStorage});
 const userStore = useUserStore();
 
 const formRef = ref<FormInstance>();
@@ -82,6 +89,7 @@ const finished = ref(false);
 const pageSize = ref(5);
 const page = ref(1);
 const total = ref(0);
+
 interface Order {
   code: number;
   status: string;
@@ -89,6 +97,8 @@ interface Order {
   paymentStatus: number;
   repairType: string;
   acceptTime: string;
+  statusDesc: string;
+  isVisible: boolean;
 }
 
 const orderList = ref<Order[]>([]);
@@ -131,21 +141,21 @@ const stepList = ref([
     value: "end",
     index: 6,
   },
-  {
-    title: "工单取消",
-    value: "cancel",
-    index: 7,
-  },
+  /* {
+     title: "工单取消",
+     value: "cancel",
+     index: 7,
+   },*/
 ]);
 
 const goToSettlement = (orderId) => {
   // 处理去结算的逻辑，例如跳转到结算页面或调用支付接口
   showToast("跳转到结算页面...");
-  router.push({ path: "/pay", query: { orderId: orderId } });
+  router.push({path: "/pay", query: {orderId: orderId}});
 };
 const goToForm = () => {
   showToast("跳转到下单页面...");
-  router.push({ path: "/form", query: {} });
+  router.push({path: "/form", query: {}});
 };
 
 onMounted(() => {
@@ -193,6 +203,7 @@ const fetchSteps = async () => {
     display: flex;
     align-items: center;
   }
+
   /deep/ .van-cell .van-cell__title {
     box-shadow: rgba(0, 0, 0, 0.1) 0px 2px 12px;
     border-radius: 8px;
@@ -205,6 +216,9 @@ const fetchSteps = async () => {
 }
 
 .settlement-button {
+  background-color: #1aad19;
+  color: white;
+  border: none;
   min-height: 22px; /* 调整按钮的最小高度，视需求而定 */
   padding: 0 10px; /* 调整按钮的内边距，使其看起来更紧凑 */
   font-size: 14px; /* 调整字体大小 */

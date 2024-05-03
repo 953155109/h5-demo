@@ -118,7 +118,7 @@ const routeModuleList: Array<RouteRecordRaw> = [
     path: '/step',
     name: 'step',
     meta: {
-      title: '',
+      title: '订单列表',
       innerPage: true,
     },
     component: () => import('@/views/workflow/Step.vue'),
@@ -127,7 +127,7 @@ const routeModuleList: Array<RouteRecordRaw> = [
     path: '/form',
     name: 'form',
     meta: {
-      title: '',
+      title: '提交订单',
       innerPage: true,
     },
     component: () => import('@/views/workflow/form.vue'),

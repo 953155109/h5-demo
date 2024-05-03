@@ -11,7 +11,6 @@
     <NavBar>
       <template #right></template>
     </NavBar>
-
     <div class="order-container">
       <van-form @failed="onFailed" @submit="onSubmit">
         <van-cell-group inset>
@@ -33,32 +32,36 @@
           />
           <!-- 通过 validator 返回错误提示 -->
           <van-field
+            type="textarea"
             v-model="desc"
             name="validatorMessage"
-            label="描述信息"
-            placeholder="描述信息"
-            :rules="[{ required: true, message: '描述信息不能为空' }]"
+            label="描述"
+            placeholder="请详细描述一下需要维修的内容"
+            :rows="3"
+            :autosize="{ minRows: 2, maxRows: 5 }"
+            :rules="[{ required: true, message: '描述不能为空' }]"
           />
         </van-cell-group>
         <div style="margin: 16px">
-          <van-button round block type="primary" native-type="submit"> 提交 </van-button>
+          <van-button round block type="primary" native-type="submit"> 提交</van-button>
         </div>
       </van-form>
     </div>
     <div class="logo-container" style="width: calc(100% - 40px); margin: 20px">
-      <img src="/logo2.jpg" alt="Company Logo" class="logo" />
+      <img src="/logo2.jpg" alt="Company Logo" class="logo"/>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { useRoute } from "vue-router";
-import { closeToast, showLoadingToast, showToast, showFailToast } from "vant";
+import {useRoute} from "vue-router";
+import {closeToast, showLoadingToast, showToast, showFailToast} from "vant";
 import NavBar from "../pay/NavBar.vue";
-import { useUserStore } from "@/store/modules/user";
-import { Postform } from "@/api/sms/sms";
-import { createStorage } from "@/utils/Storage";
-const Storage = createStorage({ storage: localStorage });
+import {useUserStore} from "@/store/modules/user";
+import {Postform} from "@/api/sms/sms";
+import {createStorage} from "@/utils/Storage";
+
+const Storage = createStorage({storage: localStorage});
 import "vant/lib/index.css";
 
 const router = useRouter();
@@ -88,7 +91,8 @@ const onSubmit = async (values) => {
   }
 };
 
-onMounted(() => {});
+onMounted(() => {
+});
 </script>
 
 <style scoped lang="less">
