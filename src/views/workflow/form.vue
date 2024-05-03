@@ -4,7 +4,7 @@
  * @Author: EVE
  * @Date: 2024-04-20 20:40:02
  * @LastEditors: EVE
- * @LastEditTime: 2024-05-03 14:39:40
+ * @LastEditTime: 2024-05-03 15:04:39
 -->
 <template>
   <div>
@@ -58,11 +58,12 @@ import NavBar from "../pay/NavBar.vue";
 import { useUserStore } from "@/store/modules/user";
 import { Postform } from "@/api/sms/sms";
 import { createStorage } from "@/utils/Storage";
+const Storage = createStorage({ storage: localStorage });
 import "vant/lib/index.css";
 
 const router = useRouter();
-
-const customerPhone = ref("");
+const phone = Storage.get("phone");
+const customerPhone = ref(phone);
 const customerName = ref("");
 const desc = ref("");
 const pattern = /^1[3456789]\d{9}$/;

@@ -4,7 +4,7 @@
  * @Author: EVE
  * @Date: 2024-04-20 20:40:02
  * @LastEditors: EVE
- * @LastEditTime: 2024-05-03 14:40:59
+ * @LastEditTime: 2024-05-03 15:05:24
 -->
 <template>
   <div class="step-box">
@@ -16,7 +16,6 @@
       <van-pull-refresh v-model="refreshing" @refresh="onRefresh">
         <van-list
           style="height: 100%; overflow: auto"
-          v-model:loading="stepsFetched"
           :finished="finished"
           finished-text="没有更多了"
         >
@@ -75,13 +74,8 @@ import { createStorage } from "@/utils/Storage";
 const Storage = createStorage({ storage: localStorage });
 const userStore = useUserStore();
 
-const { nickname } = userStore.getUserInfo;
 const formRef = ref<FormInstance>();
 
-const orderNumber = ref("");
-const activeStep = ref(0);
-const paymentStatus = ref(0);
-const stepsFetched = ref(false);
 const fetching = ref(false);
 const refreshing = ref(false);
 const finished = ref(false);
@@ -154,13 +148,10 @@ const goToForm = () => {
   router.push({ path: "/form", query: {} });
 };
 
-const next = () => {
-  active.value++;
-};
 onMounted(() => {
   fetchSteps();
 });
-
+// 下拉请求
 const onRefresh = () => {
   if (!finished.value) {
     pageSize.value += 5;
@@ -168,14 +159,12 @@ const onRefresh = () => {
   } else {
     fetching.value = false;
     refreshing.value = false;
-    stepsFetched.value = false;
   }
 };
-
+// 请求接口
 const fetchSteps = async () => {
   fetching.value = true;
   refreshing.value = true;
-  stepsFetched.value = true;
 
   const phone = Storage.get("phone");
   const resp = await getflowStatus({
@@ -185,8 +174,8 @@ const fetchSteps = async () => {
   });
   if (resp.code === 200) {
     console.log(resp.data);
-    orderList.value = resp.data.content;
-    total.value = resp.data.total;
+    orderList.value = resp.data.workNodeStatusVOS.content;
+    total.value = resp.data.count;
     if (orderList.value.length >= total.value) {
       finished.value = true;
     }
@@ -195,7 +184,6 @@ const fetchSteps = async () => {
   }
   fetching.value = false;
   refreshing.value = false;
-  stepsFetched.value = false;
 };
 </script>
 
