@@ -4,7 +4,7 @@
  * @Author: EVE
  * @Date: 2024-04-20 20:40:02
  * @LastEditors: EVE
- * @LastEditTime: 2024-04-27 19:15:17
+ * @LastEditTime: 2024-05-03 21:04:58
 -->
 <template>
   <div>
@@ -12,7 +12,7 @@
       <template #right></template>
     </NavBar>
     <div v-if="loading" class="loading-container">
-      <van-loading class="loading" color="#1989fa"/>
+      <van-loading class="loading" color="#1989fa" />
     </div>
     <div v-else class="order-container">
       <div class="order-number">订单编号: {{ orderId }}</div>
@@ -34,44 +34,42 @@
           <span class="total-price">¥{{ totalPrice }}</span>
         </div>
       </div>
-      <div v-if="payStatus === 1" class="paid-message">
-        已支付
-      </div>
+      <div v-if="payStatus === 1" class="paid-message">已支付</div>
     </div>
     <div class="logo-container" style="width: calc(100% - 40px); margin: 20px">
-      <img src="/logo2.jpg" alt="Company Logo" class="logo"/>
+      <img src="/logo2.jpg" alt="Company Logo" class="logo" />
     </div>
-    <van-submit-bar v-if="payStatus !== 1"
-                    :price="totalPrice * 100"
-                    button-text="微信支付"
-                    @submit="onSubmit"
-                    class="wechat-pay"
+    <van-submit-bar
+      v-if="payStatus !== 1"
+      :price="totalPrice * 100"
+      button-text="微信支付"
+      @submit="onSubmit"
+      class="wechat-pay"
     />
   </div>
 </template>
 
 <script setup lang="ts">
-import {useRoute} from "vue-router";
-import {FormInstance, showConfirmDialog, showDialog} from "vant";
-import {showFailToast} from "vant";
-import {showToast} from "vant";
+import { useRoute } from "vue-router";
+import { FormInstance, showConfirmDialog, showDialog } from "vant";
+import { showFailToast } from "vant";
+import { showToast } from "vant";
 import NavBar from "./NavBar.vue";
-import {useUserStore} from "@/store/modules/user";
-import {getOrder, getPayStatus, getWxOpenId, getWxpay} from "@/api/sms/sms";
-import {createStorage} from "@/utils/Storage";
-import {Dialog} from 'vant';
-import 'vant/lib/index.css';
+import { useUserStore } from "@/store/modules/user";
+import { getOrder, getPayStatus, getWxOpenId, getWxpay } from "@/api/sms/sms";
+import { createStorage } from "@/utils/Storage";
+import { Dialog } from "vant";
+import "vant/lib/index.css";
 
-const Storage = createStorage({storage: localStorage});
+const Storage = createStorage({ storage: localStorage });
 
 const userStore = useUserStore();
 const route = useRoute();
-const orderId = route.query.orderId;
 const loading = ref(false);
 const orderItems = ref([]);
 const totalPrice = ref(0);
 const payStatus = ref(0);
-const code = ref('');
+const code = ref("");
 const wxPayMessage = ref({
   appId: "",
   nonceStr: "",
@@ -83,9 +81,11 @@ const wxPayMessage = ref({
 // 0.01579
 const ua = navigator.userAgent.toLowerCase();
 const isWeiXin = ua.indexOf("micromessenger") != -1;
-
+let orderId = "";
+let phone = Storage.get("phone");
+let openId = userStore.getUserOpenId;
 function onBridgeReady() {
-  const {appId, nonceStr, packageVal, signType, paySign, timeStamp} = wxPayMessage.value;
+  const { appId, nonceStr, packageVal, signType, paySign, timeStamp } = wxPayMessage.value;
   WeixinJSBridge.invoke(
     "getBrandWCPayRequest",
     {
@@ -99,16 +99,16 @@ function onBridgeReady() {
     function (res) {
       if (res.err_msg == "get_brand_wcpay_request:ok") {
         showConfirmDialog({
-          title: '支付完成?',
+          title: "支付完成?",
           // message: '支付完成？',
           confirmButtonText: "已支付",
-          cancelButtonText: '未支付'
+          cancelButtonText: "未支付",
         })
           .then(() => {
             getWXPayResult();
           })
           .catch(() => {
-            alert("未支付 弹窗测试")
+            alert("未支付 弹窗测试");
           });
       }
     }
@@ -139,7 +139,7 @@ const getWXPayMessage = async () => {
     orderPrice: totalPrice.value, // 订单价格  订单详情里面的orderPrice
     description: "", // 订单描述 给空就行
     orderId: orderId, // 订单id  订单详情的ID
-    openId: userStore.getUserOpenId, //用户openId
+    openId: openId, //用户openId
     paymentType: 1, //支付类型  写死
   });
   loading.value = false;
@@ -152,13 +152,12 @@ const getWXPayMessage = async () => {
 };
 // 获取用户openId
 const getWXUserOpenId = async () => {
-  const phone = Storage.get("phone");
   const resp = await getWxOpenId({
     code: code.value,
     customerPhone: phone,
   });
   if (resp.code === 200) {
-    userStore.setOpenId(resp.data)
+    userStore.setOpenId(resp.data);
   } else {
     showFailToast(resp.message || "微信OpenId获取失败");
     throw Error("微信OpenId获取失败");
@@ -168,8 +167,7 @@ const getWXUserOpenId = async () => {
 // 获取订单信息
 const getOrderMessage = async () => {
   loading.value = true;
-  const phone = Storage.get("phone");
-  const resp = await getOrder({orderId: orderId, customerPhone: phone});
+  const resp = await getOrder({ orderId: orderId, customerPhone: phone });
   loading.value = false;
   if (resp.code === 200) {
     orderItems.value = resp.data.goodsInfoDTO;
@@ -180,9 +178,8 @@ const getOrderMessage = async () => {
   }
 };
 
-
 const getUserOpenId = async () => {
-  const openId = userStore.getUserOpenId;
+  openId = openId;
 
   if (openId) {
     return;
@@ -194,11 +191,15 @@ const getUserOpenId = async () => {
   }
   const appId = "wx668a7d9188ea21c5";
   const redirect = encodeURIComponent(window.location.href);
-  window.location.href = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=" + appId + "&redirect_uri=" + redirect + "&response_type=code&scope=snsapi_base&state=123#wechat_redirect";
-}
+  window.location.href =
+    "https://open.weixin.qq.com/connect/oauth2/authorize?appid=" +
+    appId +
+    "&redirect_uri=" +
+    redirect +
+    "&response_type=code&scope=snsapi_base&state=123#wechat_redirect";
+};
 
 const onSubmit = async () => {
-
   if (!isWeiXin) {
     showToast("请在微信打开此页面进行支付");
     return;
@@ -225,19 +226,38 @@ const onSubmit = async () => {
 };
 
 onMounted(() => {
-  getOrderMessage();
+  // 获取当前页面的 URL
+  const currentUrl = window.location.href;
+  // 解析 URL 中的参数
+  const urlParams = new URLSearchParams(currentUrl);
+  // 获取 URL 中的 from 参数，如果存在且值为 swy_server，则表示是从连接跳转的
+  const isFromSwyServer = urlParams.get("from") === "swy_server";
+  // 如果是从连接跳转的，则获取并设置 customerPhone 和 tempToken
+  if (isFromSwyServer) {
+    phone = urlParams.get("customerPhone") || "";
+    openId = urlParams.get("openId") || "";
+    const tempToken = urlParams.get("Temp-Token");
+    orderId = urlParams.get("orderId") || "";
 
-  if (isWeiXin) {
-    if (!code.value) {
-      const parsedUrl = new URL(window.location.href);
-      if (parsedUrl.searchParams.has('code')) {
-        // 如果存在，获取 "code" 参数
-        code.value = parsedUrl.searchParams.get('code') || '';
+    // 发送请求时将 tempToken 和 customerPhone 添加到请求头中
+    // 假设您使用的是 Axios
+    // axios.defaults.headers.common["Temp-Token"] = tempToken;
+    // axios.defaults.headers.common["customerPhone"] = customerPhone;
+    getOrderMessage();
+  } else {
+    orderId = route.query.orderId || "";
+    getOrderMessage();
+    if (isWeiXin) {
+      if (!code.value) {
+        const parsedUrl = new URL(window.location.href);
+        if (parsedUrl.searchParams.has("code")) {
+          // 如果存在，获取 "code" 参数
+          code.value = parsedUrl.searchParams.get("code") || "";
+        }
       }
+      getUserOpenId();
     }
-    getUserOpenId();
   }
-
 });
 </script>
 
