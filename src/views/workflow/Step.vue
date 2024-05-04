@@ -8,74 +8,82 @@
 -->
 <template>
   <div class="step-box">
+    <NavBar>
+      <template #right></template>
+    </NavBar>
     <!-- 输入订单号 -->
     <!-- <div style="display: flex; justify-content: center; margin-top: 20px; height: 56px">
       <van-button type="primary" @click="goToForm">下单</van-button>
     </div> -->
     <div style="min-height: 100vh; padding-bottom: 40px">
       <van-pull-refresh v-model="refreshing" @refresh="onRefresh">
-        <van-list
-          style="height: 100%; overflow: auto"
-          :finished="finished"
-          finished-text="没有更多了"
-        >
-          <van-cell v-for="item in orderList" :key="item.orderId">
-            <template #title>
-              <li>订单编号：{{ item.orderId }}</li>
-              <li>维修类型：{{ item.repairType }}</li>
-              <li>受理时间：{{ item.acceptTime }}</li>
-              <div
-                style="
+        <div v-if="orderList && orderList.length > 0">
+          <van-list
+            style="height: 100%; overflow: auto"
+            :finished="finished"
+            finished-text="没有更多了"
+          >
+            <van-cell v-for="item in orderList" :key="item.orderId">
+              <template #title>
+                <li>订单编号：{{ item.orderId }}</li>
+                <li>维修类型：{{ item.repairType }}</li>
+                <li>受理时间：{{ item.acceptTime }}</li>
+                <div
+                  style="
                   display: flex;
                   justify-content: space-between;
                   align-items: center;
                   width: 100%;
                 "
-              >
+                >
                 <span>
                   <li>订单状态：{{ item.statusDesc }}</li>
                 </span>
+                  <van-button
+                    v-if="item.status === 'settlement' && item.paymentStatus === 0"
+                    class="settlement-button"
+                    type="default"
+                    size="mini"
+                    style="background-color: #1aad19; color: white"
+                    @click="goToSettlement(item.orderId)"
+                  >
+                    去结算
+                  </van-button>
+                  <van-button
+                    v-if="item.paymentStatus === 1"
+                    class="settlement-button"
+                    type="default"
+                    size="mini"
+                    @click="goToSettlement(item.orderId)"
+                  >
+                    订单详情
+                  </van-button>
+                </div>
                 <van-button
-                  v-if="item.status === 'settlement' && item.paymentStatus === 0"
-                  class="settlement-button"
-                  type="default"
+                  v-if="item.code !== 7"
                   size="mini"
-                  style="background-color: #1aad19; color: white"
-                  @click="goToSettlement(item.orderId)"
+                  type="primary"
+                  style="background-color: white; color: #333; border: 1px solid #ccc"
+                  @click="item.isVisible = !item.isVisible"
                 >
-                  去结算
+                  {{ item.isVisible ? "隐藏流程" : "查看流程" }}
                 </van-button>
-                <van-button
-                  v-if="item.paymentStatus === 1"
-                  class="settlement-button"
-                  type="default"
-                  size="mini"
-                  @click="goToSettlement(item.orderId)"
-                >
-                  订单详情
-                </van-button>
-              </div>
-              <van-button
-                v-if="item.code !== 7"
-                size="mini"
-                type="primary"
-                style="background-color: white; color: #333; border: 1px solid #ccc"
-                @click="item.isVisible = !item.isVisible"
-              >
-                {{ item.isVisible ? "隐藏流程" : "查看流程" }}
-              </van-button>
-              <van-steps v-if="item.isVisible" direction="vertical" :active="item.code">
-                <van-step v-for="(step, index) in stepList" :key="index">
-                  {{ item.paymentStatus === 1 && step.title === "待结算" ? "已支付" : step.title }}
-                </van-step>
-              </van-steps>
-            </template>
-          </van-cell>
-        </van-list>
+                <van-steps v-if="item.isVisible" direction="vertical" :active="item.code">
+                  <van-step v-for="(step, index) in stepList" :key="index">
+                    {{ item.paymentStatus === 1 && step.title === "待结算" ? "已支付" : step.title }}
+                  </van-step>
+                </van-steps>
+              </template>
+            </van-cell>
+          </van-list>
+        </div>
+        <div v-else class="empty-order">
+          您还没有订单，请先下单
+        </div>
       </van-pull-refresh>
     </div>
     <div class="fixed-bottom">
-      <van-button block type="primary" @click="goToForm">下单</van-button>
+      <van-button block type="primary" @click="goToForm">去下单</van-button>
     </div>
   </div>
 </template>
@@ -238,5 +246,10 @@ const fetchSteps = async () => {
   font-size: 14px; /* 调整字体大小 */
   line-height: 22px; /* 调整行高以匹配按钮高度 */
   margin-left: 5px;
+}
+.empty-order {
+  text-align: center;
+  color: #aaa; /* 淡灰色 */
+  margin-top: 20px;
 }
 </style>

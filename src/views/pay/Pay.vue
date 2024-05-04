@@ -182,7 +182,6 @@ const getOrderMessage = async (tempToken) => {
 };
 
 const getUserOpenId = async () => {
-  openId = openId;
 
   if (openId) {
     return;
