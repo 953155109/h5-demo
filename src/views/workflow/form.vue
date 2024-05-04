@@ -58,26 +58,58 @@ import {useRoute} from "vue-router";
 import {closeToast, showLoadingToast, showToast, showFailToast} from "vant";
 import NavBar from "../pay/NavBar.vue";
 import {useUserStore} from "@/store/modules/user";
-import {Postform} from "@/api/sms/sms";
+import {getWxOpenId, Postform} from "@/api/sms/sms";
 import {createStorage} from "@/utils/Storage";
 
 const Storage = createStorage({storage: localStorage});
+
+const userStore = useUserStore();
+
 import "vant/lib/index.css";
 
+const ua = navigator.userAgent.toLowerCase();
+const isWeiXin = ua.indexOf("micromessenger") != -1;
 const router = useRouter();
 const phone = Storage.get("phone");
 const customerPhone = ref(phone);
 const customerName = ref("");
 const desc = ref("");
 const pattern = /^1[3456789]\d{9}$/;
-
+const code = ref("");
 // 校验函数可以返回 Promise，实现异步校验
 
 const onFailed = (errorInfo) => {
   console.log("failed", errorInfo);
 };
-
+const getWXUserOpenId = async () => {
+  const resp = await getWxOpenId({
+    code: code.value,
+    customerPhone: phone,
+  });
+  if (resp.code === 200) {
+    userStore.setOpenId(resp.data);
+  } else {
+    showFailToast(resp.message || "微信OpenId获取失败");
+    throw Error("微信OpenId获取失败");
+  }
+};
 const onSubmit = async (values) => {
+
+ /* if (!isWeiXin) {
+    showToast("请在微信客户端进行操作");
+    return;
+  }*/
+
+  const openId = userStore.getUserOpenId;
+  // 提交的时候没有获取openId
+  alert(openId)
+  if (!openId) {
+    showToast("获取微信标识失败,请重新提交订单");
+    setTimeout(() => {
+      window.location.reload();
+    }, 500);
+  }
+
   const resp = await Postform({
     customerPhone: customerPhone.value,
     customerName: customerName.value,
@@ -92,6 +124,34 @@ const onSubmit = async (values) => {
 };
 
 onMounted(() => {
+  if (isWeiXin) {
+    const openId = userStore.getUserOpenId;
+    if (!openId) {
+      //code不存在 获取code
+      if (!code.value) {
+        const parsedUrl = new URL(window.location.href);
+        if (parsedUrl.searchParams.has("code")) {
+          // 如果存在，获取 "code" 参数
+          code.value = parsedUrl.searchParams.get("code") || "";
+        }
+      }
+      // 获取到code
+      if (code.value) {
+        // 获取用户openid
+        getWXUserOpenId();
+        return;
+      }
+      // 否则code 不存在 跳转获取code
+      const appId = "wx668a7d9188ea21c5";
+      const redirect = encodeURIComponent(window.location.href);
+      window.location.href =
+        "https://open.weixin.qq.com/connect/oauth2/authorize?appid=" +
+        appId +
+        "&redirect_uri=" +
+        redirect +
+        "&response_type=code&scope=snsapi_base&state=123#wechat_redirect";
+    }
+  }
 });
 </script>
 

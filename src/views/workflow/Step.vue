@@ -7,6 +7,9 @@
  * @LastEditTime: 2024-05-03 20:32:55
 -->
 <template>
+  <NavBar>
+    <template #right></template>
+  </NavBar>
   <div class="step-box">
     <!-- 输入订单号 -->
     <!-- <div style="display: flex; justify-content: center; margin-top: 20px; height: 56px">
@@ -75,21 +78,20 @@
       </van-pull-refresh>
     </div>
     <div class="fixed-bottom">
-      <van-button block type="primary" @click="goToForm">下单</van-button>
+      <van-button block type="primary" @click="goToForm">去下单</van-button>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import type { FormInstance, List } from "vant";
-import { showToast, showFailToast } from "vant";
+import type {FormInstance, List} from "vant";
+import {showToast, showFailToast} from "vant";
 import NavBar from "../pay/NavBar.vue";
-import { useUserStore } from "@/store/modules/user";
-import { getflowStatus } from "@/api/sms/sms";
-import { createStorage } from "@/utils/Storage";
+import {useUserStore} from "@/store/modules/user";
+import {getflowStatus} from "@/api/sms/sms";
+import {createStorage} from "@/utils/Storage";
 
-const Storage = createStorage({ storage: localStorage });
-const userStore = useUserStore();
+const Storage = createStorage({storage: localStorage});
 
 const formRef = ref<FormInstance>();
 
@@ -100,6 +102,7 @@ const pageSize = ref(5);
 const page = ref(1);
 const total = ref(0);
 
+const code = ref("");
 interface Order {
   code: number;
   status: string;
@@ -161,11 +164,11 @@ const stepList = ref([
 const goToSettlement = (orderId) => {
   // 处理去结算的逻辑，例如跳转到结算页面或调用支付接口
   showToast("跳转到结算页面...");
-  router.push({ path: "/pay", query: { orderId: orderId } });
+  router.push({path: "/pay", query: {orderId: orderId}});
 };
 const goToForm = () => {
   showToast("跳转到下单页面...");
-  router.push({ path: "/form", query: {} });
+  router.push({path: "/form", query: {}});
 };
 
 onMounted(() => {
@@ -224,11 +227,13 @@ const fetchSteps = async () => {
 .note {
   color: var(--van-text-color-2);
 }
+
 .fixed-bottom {
   position: fixed;
   bottom: 0;
   width: 100%;
 }
+
 .settlement-button {
   background-color: #1aad19;
   color: white;
