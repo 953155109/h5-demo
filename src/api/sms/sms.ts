@@ -96,7 +96,7 @@ export function getOrder(params: any, headers: any) {
   return http.request(
     {
       headers: {
-        tempToken: headers.tempToken,
+        'Temp-Token': headers.tempToken,
         customerPhone: headers.customerPhone,
       },
       url: `/order/queryOrder`,

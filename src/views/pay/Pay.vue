@@ -12,7 +12,7 @@
       <template #right></template>
     </NavBar>
     <div v-if="loading" class="loading-container">
-      <van-loading class="loading" color="#1989fa" />
+      <van-loading class="loading" color="#1989fa"/>
     </div>
     <div v-else class="order-container">
       <div class="order-number">订单编号: {{ orderId }}</div>
@@ -37,7 +37,7 @@
       <div v-if="payStatus === 1" class="paid-message">已支付</div>
     </div>
     <div class="logo-container" style="width: calc(100% - 40px); margin: 20px">
-      <img src="/logo2.jpg" alt="Company Logo" class="logo" />
+      <img src="/logo2.jpg" alt="Company Logo" class="logo"/>
     </div>
     <van-submit-bar
       v-if="payStatus !== 1"
@@ -50,18 +50,19 @@
 </template>
 
 <script setup lang="ts">
-import { useRoute } from "vue-router";
-import { FormInstance, showConfirmDialog, showDialog } from "vant";
-import { showFailToast } from "vant";
-import { showToast } from "vant";
+import {useRoute} from "vue-router";
+import {FormInstance, showConfirmDialog, showDialog} from "vant";
+import {showFailToast} from "vant";
+import {showToast} from "vant";
 import NavBar from "./NavBar.vue";
-import { useUserStore } from "@/store/modules/user";
-import { getOrder, getPayStatus, getWxOpenId, getWxpay } from "@/api/sms/sms";
-import { createStorage } from "@/utils/Storage";
-import { Dialog } from "vant";
+import {useUserStore} from "@/store/modules/user";
+import {getOrder, getPayStatus, getWxOpenId, getWxpay} from "@/api/sms/sms";
+import {createStorage} from "@/utils/Storage";
+import {Dialog} from "vant";
 import "vant/lib/index.css";
+import {decryptData} from "@/utils/crypto";
 
-const Storage = createStorage({ storage: localStorage });
+const Storage = createStorage({storage: localStorage});
 
 const userStore = useUserStore();
 const route = useRoute();
@@ -84,8 +85,10 @@ const isWeiXin = ua.indexOf("micromessenger") != -1;
 let orderId = "";
 let phone = Storage.get("phone");
 let openId = userStore.getUserOpenId;
+let ecPhone = "";
+
 function onBridgeReady() {
-  const { appId, nonceStr, packageVal, signType, paySign, timeStamp } = wxPayMessage.value;
+  const {appId, nonceStr, packageVal, signType, paySign, timeStamp} = wxPayMessage.value;
   WeixinJSBridge.invoke(
     "getBrandWCPayRequest",
     {
@@ -168,8 +171,8 @@ const getWXUserOpenId = async () => {
 const getOrderMessage = async (tempToken) => {
   loading.value = true;
   const resp = await getOrder(
-    { orderId: orderId, customerPhone: phone },
-    { tempToken, customerPhone: phone }
+    {orderId: orderId, customerPhone: phone},
+    {tempToken, customerPhone: ecPhone}
   );
   loading.value = false;
   if (resp.code === 200) {
@@ -237,7 +240,8 @@ onMounted(() => {
   const isFromSwyServer = urlParams.get("from") === "swy_server";
   // 如果是从连接跳转的，则获取并设置 customerPhone 和 tempToken
   if (isFromSwyServer) {
-    phone = urlParams.get("customerPhone") || "";
+    ecPhone = urlParams.get("customerPhone") || "";
+    phone = decryptData(ecPhone)
     openId = urlParams.get("openId") || "";
     const tempToken = urlParams.get("Temp-Token");
     orderId = urlParams.get("orderId") || "";
