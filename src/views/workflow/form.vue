@@ -100,7 +100,6 @@ const onSubmit = async (values) => {
 
   const openId = userStore.getUserOpenId;
   // 提交的时候没有获取openId
-  alert(openId)
   if (!openId) {
     showToast("获取微信标识失败,请重新提交订单");
     setTimeout(() => {

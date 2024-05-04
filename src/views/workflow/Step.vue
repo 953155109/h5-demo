@@ -25,6 +25,7 @@
           >
             <van-cell v-for="item in orderList" :key="item.orderId">
               <template #title>
+                <li>订单名称：{{ item.title }}</li>
                 <li>订单编号：{{ item.orderId }}</li>
                 <li>维修类型：{{ item.repairType }}</li>
                 <li>受理时间：{{ item.acceptTime }}</li>
@@ -112,6 +113,7 @@ interface Order {
   code: number;
   status: string;
   orderId: string;
+  title: string;
   paymentStatus: number;
   repairType: string;
   acceptTime: string;
