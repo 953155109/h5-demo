@@ -4,7 +4,7 @@
  * @Author: EVE
  * @Date: 2024-04-20 20:40:02
  * @LastEditors: EVE
- * @LastEditTime: 2024-05-03 20:32:55
+ * @LastEditTime: 2024-05-04 22:45:35
 -->
 <template>
   <div class="step-box">
@@ -30,15 +30,15 @@
                 <li>受理时间：{{ item.acceptTime }}</li>
                 <div
                   style="
-                  display: flex;
-                  justify-content: space-between;
-                  align-items: center;
-                  width: 100%;
-                "
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    width: 100%;
+                  "
                 >
-                <span>
-                  <li>订单状态：{{ item.statusDesc }}</li>
-                </span>
+                  <span>
+                    <li>订单状态：{{ item.statusDesc }}</li>
+                  </span>
                   <van-button
                     v-if="item.status === 'settlement' && item.paymentStatus === 0"
                     class="settlement-button"
@@ -70,16 +70,16 @@
                 </van-button>
                 <van-steps v-if="item.isVisible" direction="vertical" :active="item.code">
                   <van-step v-for="(step, index) in stepList" :key="index">
-                    {{ item.paymentStatus === 1 && step.title === "待结算" ? "已支付" : step.title }}
+                    {{
+                      item.paymentStatus === 1 && step.title === "待结算" ? "已支付" : step.title
+                    }}
                   </van-step>
                 </van-steps>
               </template>
             </van-cell>
           </van-list>
         </div>
-        <div v-else class="empty-order">
-          您还没有订单，请先下单
-        </div>
+        <div v-else class="empty-order">您还没有订单，请先下单</div>
       </van-pull-refresh>
     </div>
     <div class="fixed-bottom">
@@ -89,14 +89,14 @@
 </template>
 
 <script setup lang="ts">
-import type {FormInstance, List} from "vant";
-import {showToast, showFailToast} from "vant";
+import type { FormInstance, List } from "vant";
+import { showToast, showFailToast } from "vant";
 import NavBar from "../pay/NavBar.vue";
-import {useUserStore} from "@/store/modules/user";
-import {getflowStatus} from "@/api/sms/sms";
-import {createStorage} from "@/utils/Storage";
+import { useUserStore } from "@/store/modules/user";
+import { getflowStatus } from "@/api/sms/sms";
+import { createStorage } from "@/utils/Storage";
 
-const Storage = createStorage({storage: localStorage});
+const Storage = createStorage({ storage: localStorage });
 
 const formRef = ref<FormInstance>();
 
@@ -169,11 +169,11 @@ const stepList = ref([
 const goToSettlement = (orderId) => {
   // 处理去结算的逻辑，例如跳转到结算页面或调用支付接口
   showToast("跳转到结算页面...");
-  router.push({path: "/pay", query: {orderId: orderId}});
+  router.push({ path: "/pay", query: { orderId: orderId } });
 };
 const goToForm = () => {
   showToast("跳转到下单页面...");
-  router.push({path: "/form", query: {}});
+  router.push({ path: "/form", query: {} });
 };
 
 onMounted(() => {
@@ -183,11 +183,8 @@ onMounted(() => {
 const onRefresh = () => {
   if (!finished.value) {
     pageSize.value += 5;
-    fetchSteps();
-  } else {
-    fetching.value = false;
-    refreshing.value = false;
   }
+  fetchSteps();
 };
 // 请求接口
 const fetchSteps = async () => {
