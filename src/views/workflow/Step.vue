@@ -7,9 +7,6 @@
  * @LastEditTime: 2024-05-03 20:32:55
 -->
 <template>
-  <NavBar>
-    <template #right></template>
-  </NavBar>
   <div class="step-box">
     <NavBar>
       <template #right></template>
