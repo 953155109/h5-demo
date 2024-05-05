@@ -1,4 +1,4 @@
-import { http } from "@/utils/http/axios";
+import {http} from "@/utils/http/axios";
 
 export interface BasicResponseModel<T = any> {
   code: number;
@@ -57,6 +57,7 @@ export function changePassword(params: any, uid: any) {
     }
   );
 }
+
 /**
  * @description: 获取流程信息
  */
@@ -112,9 +113,13 @@ export function getOrder(params: any, headers: any) {
 /**
  * @description: 获取微信支付信息
  */
-export function getWxpay(params: any) {
+export function getWxpay(params: any,headers: any) {
   return http.request(
     {
+      headers: {
+        'Temp-Token': headers.tempToken,
+        customerPhone: headers.customerPhone,
+      },
       url: `/wxPay/prepay`,
       method: "POST",
       params,

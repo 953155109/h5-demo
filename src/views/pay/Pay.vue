@@ -50,7 +50,7 @@
 </template>
 
 <script setup lang="ts">
-import {useRoute} from "vue-router";
+import {LocationQueryValue, useRoute} from "vue-router";
 import {FormInstance, showConfirmDialog, showDialog} from "vant";
 import {showFailToast} from "vant";
 import {showToast} from "vant";
@@ -82,11 +82,11 @@ const wxPayMessage = ref({
 // 0.01579
 const ua = navigator.userAgent.toLowerCase();
 const isWeiXin = ua.indexOf("micromessenger") != -1;
-let orderId = "";
+let orderId: string | LocationQueryValue[] = "";
 let phone = Storage.get("phone");
 let openId = userStore.getUserOpenId;
 let ecPhone = "";
-
+let tempToken: string | null = "";
 function onBridgeReady() {
   const {appId, nonceStr, packageVal, signType, paySign, timeStamp} = wxPayMessage.value;
   WeixinJSBridge.invoke(
@@ -136,15 +136,16 @@ const getWXPayResult = async () => {
 };
 
 // 获取微信支付信息
-const getWXPayMessage = async () => {
+const getWXPayMessage = async (tempToken) => {
   loading.value = true;
   const resp = await getWxpay({
-    orderPrice: totalPrice.value, // 订单价格  订单详情里面的orderPrice
-    description: "", // 订单描述 给空就行
-    orderId: orderId, // 订单id  订单详情的ID
-    openId: openId, //用户openId
-    paymentType: 1, //支付类型  写死
-  });
+      orderPrice: totalPrice.value, // 订单价格  订单详情里面的orderPrice
+      description: "", // 订单描述 给空就行
+      orderId: orderId, // 订单id  订单详情的ID
+      openId: openId, //用户openId
+      paymentType: 1, //支付类型  写死
+    }, {tempToken, customerPhone: ecPhone}
+  );
   loading.value = false;
   if (resp.code === 200) {
     wxPayMessage.value = resp.data;
@@ -205,18 +206,22 @@ const getUserOpenId = async () => {
 };
 
 const onSubmit = async () => {
+  alert("请求支付")
   if (!isWeiXin) {
     showToast("请在微信打开此页面进行支付");
     return;
   }
 
+  alert("获取openId")
   await getUserOpenId();
 
-  if (!userStore.getUserOpenId) {
+
+  if (!openId) {
+    alert("openId获取失败")
     return;
   }
 
-  await getWXPayMessage();
+  await getWXPayMessage(tempToken);
   if (typeof WeixinJSBridge == "undefined") {
     if (document.addEventListener) {
       document.addEventListener("WeixinJSBridgeReady", onBridgeReady, false);
@@ -240,25 +245,27 @@ onMounted(() => {
   const isFromSwyServer = urlParams.get("from") === "swy_server";
   // 如果是从连接跳转的，则获取并设置 customerPhone 和 tempToken
   if (isFromSwyServer) {
+    alert("连接跳转支付")
     ecPhone = urlParams.get("customerPhone") || "";
     phone = decryptData(ecPhone)
     openId = urlParams.get("openId") || "";
-    const tempToken = urlParams.get("Temp-Token");
+    tempToken = urlParams.get("Temp-Token");
     orderId = urlParams.get("orderId") || "";
     getOrderMessage(tempToken);
   } else {
     orderId = route.query.orderId || "";
-    getOrderMessage();
-    if (isWeiXin) {
-      if (!code.value) {
-        const parsedUrl = new URL(window.location.href);
-        if (parsedUrl.searchParams.has("code")) {
-          // 如果存在，获取 "code" 参数
-          code.value = parsedUrl.searchParams.get("code") || "";
-        }
+    getOrderMessage(tempToken);
+  }
+
+  if (isWeiXin) {
+    if (!code.value) {
+      const parsedUrl = new URL(window.location.href);
+      if (parsedUrl.searchParams.has("code")) {
+        // 如果存在，获取 "code" 参数
+        code.value = parsedUrl.searchParams.get("code") || "";
       }
-      getUserOpenId();
     }
+    getUserOpenId();
   }
 });
 </script>
