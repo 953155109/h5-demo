@@ -105,8 +105,8 @@ const route = useRoute();
 const formRef = ref<FormInstance>();
 const loading = ref(false);
 const formData = reactive({
-  userPhone: "13825080826",
-  password: "123456",
+  userPhone: "",
+  password: "",
   sms: "",
 });
 import { createStorage } from "@/utils/Storage";

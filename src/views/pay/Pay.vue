@@ -122,7 +122,7 @@ const getWXPayResult = async () => {
   loading.value = true;
   const resp = await getPayStatus({
     orderId: orderId, // 订单id  订单详情的ID
-  });
+  },{tempToken, orderId});
   loading.value = false;
   if (resp.code === 200) {
     loading.value = true; // 显示加载状态

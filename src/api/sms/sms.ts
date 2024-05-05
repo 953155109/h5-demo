@@ -143,9 +143,13 @@ export function getWxOpenId(params: any) {
   );
 }
 
-export function getPayStatus(params: any) {
+export function getPayStatus(params: any,headers: any) {
   return http.request(
     {
+      headers: {
+        'Temp-Token': headers.tempToken,
+        'Customer-Order': headers.orderId,
+      },
       url: `/wxPay/callBack`,
       method: "POST",
       params,
