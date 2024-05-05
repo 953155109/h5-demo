@@ -1,14 +1,14 @@
-import type { Router } from 'vue-router'
-import { isNavigationFailure } from 'vue-router'
+import type {Router} from 'vue-router'
+import {isNavigationFailure} from 'vue-router'
 import NProgress from 'nprogress'
-import { useRouteStoreWidthOut } from '@/store/modules/route'
-import { useUserStoreWidthOut } from '@/store/modules/user'
-import { ACCESS_TOKEN } from '@/store/mutation-types'
-import { storage } from '@/utils/Storage'
-import { PageEnum } from '@/enums/pageEnum'
+import {useRouteStoreWidthOut} from '@/store/modules/route'
+import {useUserStoreWidthOut} from '@/store/modules/user'
+import {ACCESS_TOKEN} from '@/store/mutation-types'
+import {storage} from '@/utils/Storage'
+import {PageEnum} from '@/enums/pageEnum'
 import 'nprogress/nprogress.css'
 
-NProgress.configure({ parent: '#app' })
+NProgress.configure({parent: '#app'})
 
 const LOGIN_PATH = PageEnum.BASE_LOGIN
 
@@ -34,7 +34,8 @@ export function createRouterGuards(router: Router) {
 
     const token = storage.get(ACCESS_TOKEN)
 
-    if (!token) {
+    const hasTempToken = to.query['Temp-Token'];
+    if (!token && !hasTempToken) {
       // redirect login page
       next(LOGIN_PATH)
       return
@@ -44,8 +45,7 @@ export function createRouterGuards(router: Router) {
     if (userStore.getLastUpdateTime === 0) {
       try {
         await userStore.GetUserInfo()
-      }
-      catch (err) {
+      } catch (err) {
         next()
         return
       }
@@ -74,8 +74,7 @@ export function createRouterGuards(router: Router) {
       // 需要缓存的组件
       keepAliveComponents.push(currentComName)
       // keepAlive 为 false 则不缓存
-    }
-    else if (!to.meta?.keepAlive) {
+    } else if (!to.meta?.keepAlive) {
       // 不需要缓存的组件
 
       // 这里的作用一开始组件设置为缓存，之后又设置不缓存但是它还是存在 keepAliveComponents 数组中

@@ -98,7 +98,7 @@ export function getOrder(params: any, headers: any) {
     {
       headers: {
         'Temp-Token': headers.tempToken,
-        customerPhone: headers.customerPhone,
+        'Customer-Order': headers.orderId,
       },
       url: `/order/queryOrder`,
       method: "POST",
@@ -118,7 +118,7 @@ export function getWxpay(params: any,headers: any) {
     {
       headers: {
         'Temp-Token': headers.tempToken,
-        customerPhone: headers.customerPhone,
+        'Customer-Order': headers.orderId,
       },
       url: `/wxPay/prepay`,
       method: "POST",

@@ -144,7 +144,7 @@ const getWXPayMessage = async (tempToken) => {
       orderId: orderId, // 订单id  订单详情的ID
       openId: openId, //用户openId
       paymentType: 1, //支付类型  写死
-    }, {tempToken, customerPhone: ecPhone}
+    }, {tempToken, orderId}
   );
   loading.value = false;
   if (resp.code === 200) {
@@ -173,7 +173,7 @@ const getOrderMessage = async (tempToken) => {
   loading.value = true;
   const resp = await getOrder(
     {orderId: orderId, customerPhone: phone},
-    {tempToken, customerPhone: ecPhone}
+    {tempToken, orderId}
   );
   loading.value = false;
   if (resp.code === 200) {
@@ -206,18 +206,16 @@ const getUserOpenId = async () => {
 };
 
 const onSubmit = async () => {
-  alert("请求支付")
   if (!isWeiXin) {
     showToast("请在微信打开此页面进行支付");
     return;
   }
 
-  alert("获取openId")
   await getUserOpenId();
 
 
   if (!openId) {
-    alert("openId获取失败")
+    showToast("获取openId失败,请刷新页面重试");
     return;
   }
 
@@ -245,7 +243,6 @@ onMounted(() => {
   const isFromSwyServer = urlParams.get("from") === "swy_server";
   // 如果是从连接跳转的，则获取并设置 customerPhone 和 tempToken
   if (isFromSwyServer) {
-    alert("连接跳转支付")
     ecPhone = urlParams.get("customerPhone") || "";
     phone = decryptData(ecPhone)
     openId = urlParams.get("openId") || "";
